@@ -17,8 +17,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/github")
 public class GitHubController {
-    @Autowired
-    private GitHubService gitHubService;
+    private final GitHubService gitHubService;
+
+    public GitHubController(GitHubService gitHubService) {
+        this.gitHubService = gitHubService;
+    }
 
     @GetMapping("/repos")
     public List<RepoInfo> getRepos() {

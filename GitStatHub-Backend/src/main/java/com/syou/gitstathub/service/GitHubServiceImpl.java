@@ -18,8 +18,11 @@ public class GitHubServiceImpl implements GitHubService {
     @Value("${github.username}")
     private String username;
 
-    @Autowired
-    private GitHubApiHelper gitHubApiHelper;
+    private final GitHubApiHelper gitHubApiHelper;
+
+    public GitHubServiceImpl(GitHubApiHelper gitHubApiHelper) {
+        this.gitHubApiHelper = gitHubApiHelper;
+    }
 
     @Override
     public List<RepoInfo> fetchUserRepos() {

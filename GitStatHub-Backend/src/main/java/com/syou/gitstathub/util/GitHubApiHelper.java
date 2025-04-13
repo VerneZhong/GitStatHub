@@ -15,8 +15,11 @@ import java.util.List;
  */
 @Component
 public class GitHubApiHelper {
-    @Autowired
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+
+    public GitHubApiHelper(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     public List<RepoInfo> getUserRepos(String username) {
         String url = "https://api.github.com/users/" + username + "/repos";

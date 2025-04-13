@@ -1,6 +1,7 @@
 package com.syou.gitstathub.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
 import lombok.Data;
 
 /**
@@ -9,7 +10,11 @@ import lombok.Data;
  * @description
  */
 @Data
+@Entity
 public class RepoInfo {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
     private String name;
     private String description;
     private String language;
@@ -17,4 +22,7 @@ public class RepoInfo {
     private int stargazersCount;
     @JsonProperty("updated_at")
     private String updatedAt;
+
+    @Version
+    private Long version;
 }
