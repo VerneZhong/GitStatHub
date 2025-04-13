@@ -1,0 +1,9 @@
+github:
+  username: VerneZhong
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gitstathub-api
