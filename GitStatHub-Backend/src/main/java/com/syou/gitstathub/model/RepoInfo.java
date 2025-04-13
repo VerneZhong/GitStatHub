@@ -22,7 +22,6 @@ public class RepoInfo {
     private int stargazersCount;
     @JsonProperty("updated_at")
     private String updatedAt;
-
     @Version
     private Long version;
 }

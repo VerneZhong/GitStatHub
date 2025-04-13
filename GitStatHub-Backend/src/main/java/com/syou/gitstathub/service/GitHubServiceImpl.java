@@ -2,7 +2,6 @@ package com.syou.gitstathub.service;
 
 import com.syou.gitstathub.model.RepoInfo;
 import com.syou.gitstathub.util.GitHubApiHelper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

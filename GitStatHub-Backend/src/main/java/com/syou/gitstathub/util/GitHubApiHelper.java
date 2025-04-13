@@ -1,10 +1,10 @@
 package com.syou.gitstathub.util;
 
 import com.syou.gitstathub.model.RepoInfo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,8 +22,22 @@ public class GitHubApiHelper {
     }
 
     public List<RepoInfo> getUserRepos(String username) {
-        String url = "https://api.github.com/users/" + username + "/repos";
-        RepoInfo[] repos = restTemplate.getForObject(url, RepoInfo[].class);
-        return Arrays.asList(repos);
+        List<RepoInfo> allRepos = new ArrayList<>();
+        int page = 1;
+        RepoInfo[] reposOnPage;
+
+        do {
+            String url = "https://api.github.com/users/" + username + "/repos?page=" + page + "&per_page=100";
+            reposOnPage = restTemplate.getForObject(url, RepoInfo[].class);
+
+            if (reposOnPage.length > 0) {
+                allRepos.addAll(Arrays.asList(reposOnPage));
+                page++;
+            } else {
+                break;
+            }
+        } while (reposOnPage.length == 100);
+
+        return allRepos;
     }
 }

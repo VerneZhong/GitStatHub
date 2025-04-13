@@ -2,7 +2,6 @@ package com.syou.gitstathub.controller;
 
 import com.syou.gitstathub.model.RepoInfo;
 import com.syou.gitstathub.service.GitHubService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

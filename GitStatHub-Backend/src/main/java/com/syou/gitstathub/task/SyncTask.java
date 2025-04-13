@@ -35,10 +35,8 @@ public class SyncTask {
         List<RepoInfo> repos = gitHubService.fetchUserRepos();
         if (repos != null) {
             for (RepoInfo repo : repos) {
-                // 根据名称或其他唯一标识符查找
                 Optional<RepoInfo> existingRepo = repoInfoRepository.findByName(repo.getName());
                 if (existingRepo.isPresent()) {
-                    // 更新现有记录的属性
                     RepoInfo existing = existingRepo.get();
                     existing.setDescription(repo.getDescription());
                     existing.setLanguage(repo.getLanguage());
@@ -46,8 +44,8 @@ public class SyncTask {
                     existing.setUpdatedAt(repo.getUpdatedAt());
                     repoInfoRepository.save(existing);
                 } else {
-                    // 新记录
-                    repo.setId(null); // 确保ID为空，让数据库生成
+                    // 新記録
+                    repo.setId(null);
                     repoInfoRepository.save(repo);
                 }
             }
