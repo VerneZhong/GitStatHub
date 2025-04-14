@@ -1,30 +1,50 @@
-<script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
+<!-- src/App.vue -->
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div class="app-container">
+    <h1>📊 GitStatHub</h1>
+    <p>VerneZhong の GitHub プロジェクト一覧</p>
+
+    <div class="repo-list">
+      <RepoCard
+          v-for="repo in repos"
+          :key="repo.id"
+          :repo="repo"
+      />
+    </div>
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { getRepos } from '@/services/api'
+import RepoCard from '@/components/RepoCard.vue'
+import type { RepoInfo } from '@/types'
+
+const repos = ref<RepoInfo[]>([])
+
+onMounted(async () => {
+  try {
+    const res = await getRepos()
+    repos.value = res.data
+  } catch (err) {
+    console.error('GitHub リポジトリの取得に失敗しました:', err)
+  }
+})
+</script>
+
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.app-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+  text-align: center;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+
+.repo-list {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
 }
 </style>
