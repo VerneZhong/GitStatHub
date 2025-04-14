@@ -16,6 +16,7 @@ public class RepoInfo {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
+    @Column(columnDefinition = "TEXT")
     private String description;
     private String language;
     @JsonProperty("stargazers_count")

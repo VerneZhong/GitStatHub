@@ -4,8 +4,8 @@
 
 ## 🔧 使用技術
 - バックエンド：Spring Boot（Java）
-- フロントエンド：Thymeleaf / Vue.js（選択可）
-- データベース：MySQL / Redis
+- フロントエンド：Vue.js
+- データベース：MySQL
 - その他：GitHub REST API, ECharts
 
 ## ✨ 主な機能
@@ -15,4 +15,4 @@
 - プロフィールページをポートフォリオとして公開可能
 
 ## 🛠️ テクノロジースタック
-Spring Boot + WebClient + Redis + MySQL + ECharts + Thymeleaf
+Spring Boot + MySQL + ECharts + Vue.js
