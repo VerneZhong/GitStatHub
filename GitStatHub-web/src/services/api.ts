@@ -6,5 +6,5 @@ const api = axios.create({
 
 export const getRepos = async () => {
     const res = await api.get('/api/repo/repos')
-    return res
+    return res.data
 }

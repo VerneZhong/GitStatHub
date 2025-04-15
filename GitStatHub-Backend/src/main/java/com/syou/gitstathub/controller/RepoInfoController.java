@@ -1,6 +1,8 @@
 package com.syou.gitstathub.controller;
 
+import com.syou.gitstathub.dto.RepoDto;
 import com.syou.gitstathub.model.RepoInfo;
+import com.syou.gitstathub.response.ResultVo;
 import com.syou.gitstathub.service.RepoInfoService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +25,8 @@ public class RepoInfoController {
     }
 
     @GetMapping("/repos")
-    public List<RepoInfo> getRepos() {
-        return repoInfoService.getUserRepos();
+    public ResultVo<List<RepoDto>> getRepos() {
+        List<RepoInfo> userRepos = repoInfoService.getUserRepos();
+        return ResultVo.success(userRepos.stream().map(RepoDto::buildDto).toList());
     }
 }
