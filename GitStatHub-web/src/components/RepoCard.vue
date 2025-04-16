@@ -3,7 +3,7 @@
     <h2>{{ repo.name }}</h2>
     <p>{{ repo.description || 'No description' }}</p>
     <p>🌐 {{ repo.language || 'N/A' }} ｜ ⭐ {{ repo.stargazersCount }}</p>
-    <small>更新日: {{ repo.updatedAt }}</small>
+    <p><strong>更新日:</strong> {{ formatDate(repo.updatedAt) }}</p>
   </div>
 </template>
 
@@ -13,6 +13,10 @@ import type { RepoInfo } from '@/types'
 const props = defineProps<{
   repo: RepoInfo
 }>()
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString()
+}
 </script>
 
 <style scoped>

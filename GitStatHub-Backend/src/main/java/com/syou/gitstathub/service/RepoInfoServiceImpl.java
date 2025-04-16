@@ -2,6 +2,7 @@ package com.syou.gitstathub.service;
 
 import com.syou.gitstathub.model.RepoInfo;
 import com.syou.gitstathub.repository.RepoInfoRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +23,6 @@ public class RepoInfoServiceImpl implements RepoInfoService {
 
     @Override
     public List<RepoInfo> getUserRepos() {
-        return repoInfoRepository.findAll();
+        return repoInfoRepository.findAll(Sort.by(Sort.Direction.DESC, "updatedAt"));
     }
 }

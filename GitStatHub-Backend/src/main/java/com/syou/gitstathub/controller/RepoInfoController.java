@@ -27,6 +27,7 @@ public class RepoInfoController {
     @GetMapping("/repos")
     public ResultVo<List<RepoDto>> getRepos() {
         List<RepoInfo> userRepos = repoInfoService.getUserRepos();
-        return ResultVo.success(userRepos.stream().map(RepoDto::buildDto).toList());
+        List<RepoDto> repoDtoList = userRepos.stream().map(RepoDto::buildDto).toList();
+        return ResultVo.success(repoDtoList);
     }
 }
