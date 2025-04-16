@@ -23,4 +23,5 @@ npm create vite@latest gitstathub-web -- --template vue-ts
 cd gitstathub-web
 npm install
 npm install axios
+npm install echarts-for-vue echarts
 npm run dev

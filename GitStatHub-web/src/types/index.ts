@@ -7,3 +7,8 @@ export interface RepoInfo {
     stargazersCount: number
     updatedAt: string
 }
+
+export interface UserInfo {
+    name: string
+    avatarUrl: string
+}
