@@ -1,36 +1,15 @@
 <template>
-  <div v-if="calendar">
-    <h2 class="text-xl font-bold mb-4">月間/年間アクティビティ</h2>
-    <div class="flex gap-8">
-      <!-- 1. 左边：当月统计 -->
-      <div>
-        <p>今月の貢献数：<strong>{{ currentMonthTotal }}</strong></p>
-        <p>総貢献数：{{ calendar.totalContributions }}</p>
-      </div>
-
-      <!-- 2. 右边：贡献日历格子 -->
-      <div class="grid grid-cols-53 gap-[2px]">
-        <div
-            v-for="(week, wIdx) in calendar.weeks"
-            :key="wIdx"
-            class="flex flex-col gap-[2px]"
-        >
-          <div
-              v-for="(day, dIdx) in week.contributionDays"
-              :key="dIdx"
-              :title="`${day.date}: ${day.contributionCount} contributions`"
-              class="w-3 h-3 rounded-sm"
-              :style="{ backgroundColor: day.color }"
-          />
-        </div>
-      </div>
-    </div>
+  <div>
+    <h2>年間アクティビティ</h2>
+    <p>今月の貢献数: {{ currentMonthTotal }} / 総貢献数: {{ totalContributions }}</p>
+    <ContributionGrid v-if="calendar" :weeks="calendar.weeks" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { getContributionCalendar } from '@/services/api'
+import ContributionGrid from './ContributionGrid.vue'
 
 const props = defineProps<{
   username: string
@@ -65,6 +44,12 @@ onMounted(async () => {
   } catch (err) {
     console.error('貢献データの取得に失敗しました:', err)
   }
+})
+
+const totalContributions = computed(() => {
+  if (!calendar.value) return 0
+  return calendar.value.weeks.flatMap((w: any) => w.contributionDays)
+      .reduce((sum, day) => sum + day.contributionCount, 0)
 })
 </script>
 
