@@ -5,16 +5,28 @@
     <p>桜影 の GitHub プロジェクト一覧</p>
     <div class="profile-info">
       <img :src="user.avatarUrl" alt="avatar" class="avatar"/>
-      <p class="username">{{ user.login }}</p>
+      <p class="username">
+        {{ user.login }}
+        <a :href="`https://github.com/${user.login}`" class="repo-link">GitHub で見る</a>
+      </p>
     </div>
-    <button class="toggle-btn" @click="toggleView">
-      {{ viewMode === 'list' ? '📊 チャートで表示' : '📦 一覧で表示' }}
-    </button>
-    <div v-if="viewMode === 'chart'">
+
+    <!-- 🔽 选项卡切换 -->
+    <div class="tab-buttons">
+      <button :class="{ active: viewTab === 'list' }" @click="viewTab = 'list'">📦 一覧</button>
+      <button :class="{ active: viewTab === 'chart' }" @click="viewTab = 'chart'">📊 チャート</button>
+      <button :class="{ active: viewTab === 'calendar' }" @click="viewTab = 'calendar'">📅 カレンダー</button>
+    </div>
+
+    <!-- 🔽 内容区域 -->
+    <div v-if="viewTab === 'list'" class="repo-list">
+      <RepoCard v-for="repo in repos" :key="repo.id" :repo="repo" />
+    </div>
+    <div v-else-if="viewTab === 'chart'">
       <RepoLanguageChart :repos="repos" />
     </div>
-    <div v-else class="repo-list">
-      <RepoCard v-for="repo in repos" :key="repo.id" :repo="repo" />
+    <div v-else>
+      <ContributionCalendar :username="user.login" />
     </div>
   </div>
 </template>
@@ -24,14 +36,13 @@ import { onMounted, ref } from 'vue'
 import { getRepos } from '@/services/api'
 import RepoCard from '@/components/RepoCard.vue'
 import RepoLanguageChart from '@/components/RepoLanguageChart.vue'
+import ContributionCalendar from '@/components/ContributionCalendar.vue'
 import type { RepoInfo } from '@/types'
 
 const repos = ref<RepoInfo[]>([])
 const viewMode = ref<'list' | 'chart'>('list')
+const viewTab = ref<'list' | 'chart' | 'calendar'>('list')
 const user = ref({ login: 'VerneZhong', avatarUrl: 'https://avatars.githubusercontent.com/u/28047190?s=400&u=aa42d63223ab9dacd73967056a49f1e69149071d&v=4' })
-const toggleView = () => {
-  viewMode.value = viewMode.value === 'list' ? 'chart' : 'list'
-}
 
 onMounted(async () => {
   try {
@@ -91,5 +102,27 @@ onMounted(async () => {
 .card:hover {
   transform: translateY(-4px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.tab-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.tab-buttons button {
+  padding: 0.5rem 1rem;
+  background-color: #eee;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.tab-buttons button.active {
+  background-color: #007acc;
+  color: white;
 }
 </style>

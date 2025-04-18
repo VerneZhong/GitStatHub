@@ -29,8 +29,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { ref, onMounted, computed } from 'vue'
+import { getContributionCalendar } from '@/services/api'
 
 const props = defineProps<{
   username: string
@@ -39,7 +39,7 @@ const props = defineProps<{
 const calendar = ref<any>(null)
 
 const currentMonthTotal = computed(() => {
-  if (!calendar.value) return 0
+  if (!calendar.value || !calendar.value.weeks) return 0
 
   const now = new Date()
   const thisMonth = now.getMonth()
@@ -60,9 +60,7 @@ const currentMonthTotal = computed(() => {
 
 onMounted(async () => {
   try {
-    const res = await axios.get('/api/github/contributions', {
-      params: { username: props.username }
-    })
+    const res = await getContributionCalendar(props.username)
     calendar.value = res.data
   } catch (err) {
     console.error('貢献データの取得に失敗しました:', err)

@@ -8,3 +8,9 @@ export const getRepos = async () => {
     const res = await api.get('/api/repo/repos')
     return res.data
 }
+
+export const getContributionCalendar = (username: string) => {
+    return api.get('/api/github/contributions', {
+        params: { username }
+    })
+}

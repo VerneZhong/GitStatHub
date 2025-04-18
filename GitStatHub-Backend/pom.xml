@@ -57,7 +57,6 @@
             <version>${graphql.version}</version>
         </dependency>
 
-
     </dependencies>
 
 </project>
