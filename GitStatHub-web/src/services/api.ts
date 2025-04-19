@@ -14,3 +14,8 @@ export const getContributionCalendar = (username: string) => {
         params: { username }
     })
 }
+
+export const getContributions = async (username: string) => {
+    const res = await api.get(`/api/github/contributions/${username}`)
+    return res.data
+}

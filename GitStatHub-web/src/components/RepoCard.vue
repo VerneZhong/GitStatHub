@@ -1,14 +1,14 @@
 <template>
   <div class="card">
     <h2>{{ repo.name }}</h2>
-    <p>{{ repo.description || 'No description' }}</p>
+    <p>{{ repo.description || '説明なし' }}</p>
     <p>🌐 {{ repo.language || 'N/A' }} ｜ ⭐ {{ repo.stargazersCount }}</p>
     <p><strong>更新日:</strong> {{ formatDate(repo.updatedAt) }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { RepoInfo } from '@/types'
+import type {RepoInfo} from '@/types'
 
 const props = defineProps<{
   repo: RepoInfo

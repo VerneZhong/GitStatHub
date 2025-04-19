@@ -11,14 +11,14 @@
       </p>
     </div>
 
-    <!-- 🔽 选项卡切换 -->
+    <!-- 🔽 タブ切り替え -->
     <div class="tab-buttons">
       <button :class="{ active: viewTab === 'list' }" @click="viewTab = 'list'">📦 一覧</button>
       <button :class="{ active: viewTab === 'chart' }" @click="viewTab = 'chart'">📊 チャート</button>
       <button :class="{ active: viewTab === 'calendar' }" @click="viewTab = 'calendar'">📅 カレンダー</button>
     </div>
 
-    <!-- 🔽 内容区域 -->
+    <!-- 🔽 コンテンツエリア -->
     <div v-if="viewTab === 'list'" class="repo-list">
       <RepoCard v-for="repo in repos" :key="repo.id" :repo="repo" />
     </div>
