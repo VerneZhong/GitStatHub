@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2>年間アクティビティ</h2>
-    <p>今月の貢献数: {{ currentMonthTotal }} / 総貢献数: {{ totalContributions }}</p>
+<!--    <p>今月の貢献数: {{ currentMonthTotal }} / 総貢献数: {{ totalContributions }}</p>-->
     <ContributionGrid v-if="calendar" :weeks="calendar.weeks" />
   </div>
 </template>

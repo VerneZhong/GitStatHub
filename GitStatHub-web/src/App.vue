@@ -40,7 +40,6 @@ import ContributionCalendar from '@/components/ContributionCalendar.vue'
 import type { RepoInfo } from '@/types'
 
 const repos = ref<RepoInfo[]>([])
-const viewMode = ref<'list' | 'chart'>('list')
 const viewTab = ref<'list' | 'chart' | 'calendar'>('list')
 const user = ref({ login: 'VerneZhong', avatarUrl: 'https://avatars.githubusercontent.com/u/28047190?s=400&u=aa42d63223ab9dacd73967056a49f1e69149071d&v=4' })
 
