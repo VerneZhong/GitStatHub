@@ -13,14 +13,21 @@
     <!-- 贡献网格 -->
     <div class="contribution-grid">
       <div v-for="(row, rowIndex) in contributionGrid" :key="rowIndex" class="grid-row">
+<!--        <div-->
+<!--            v-for="(cell, cellIndex) in row"-->
+<!--            :key="cellIndex"-->
+<!--            class="grid-cell"-->
+<!--            :class="{ 'has-contributions': cell.count > 0 }"-->
+<!--            :style="{ backgroundColor: getColor(cell.count) }"-->
+<!--            :data-tooltip="cell.date ? `${cell.count} contributions on ${formatDate(cell.date)}` : ''"-->
+<!--        ></div>-->
         <div
             v-for="(cell, cellIndex) in row"
             :key="cellIndex"
-            class="grid-cell"
-            :class="{ 'has-contributions': cell.count > 0 }"
+            :class="['grid-cell', 'tooltip-enabled', { 'has-contributions': cell.count > 0 }]"
             :style="{ backgroundColor: getColor(cell.count) }"
-            :data-tooltip="cell.date ? `${cell.count} contributions on ${formatDate(cell.date)}` : ''"
-        ></div>
+            :data-tooltip="cell.date ? getTooltip(cell.count, cell.date) : ''"
+        />
       </div>
     </div>
 
@@ -104,7 +111,6 @@ const contributionStats = ref({
 async function fetchContributionData() {
   try {
     const data = await getContributions(props.username);
-    console.log(data)
 
     // 更新统计信息
     contributionStats.value = {
@@ -136,11 +142,8 @@ function transformContributionData(weeks) {
       week.contributionDays.forEach(day => {
         const date = new Date(day.date);
         const dayOfWeek = date.getDay(); // 0(周日)到6(周六)
-        // 调整以匹配GitHub的显示(周一在索引0)
-        const rowIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-
         if (weekIndex < 53) {
-          grid[rowIndex][weekIndex] = {
+          grid[dayOfWeek][weekIndex] = {
             count: day.contributionCount,
             date: day.date
           };
@@ -303,6 +306,36 @@ watch(() => props.username, () => {
 
   .grid-cell.has-contributions:hover::before {
     border-color: #2d333b transparent transparent transparent;
+  }
+
+  .grid-cell.tooltip-enabled:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #24292f;
+    color: #ffffff;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 10;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  }
+
+  .grid-cell.tooltip-enabled:hover::before {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: #24292f transparent transparent transparent;
+    margin-bottom: 3px;
+    z-index: 10;
   }
 }
 </style>
