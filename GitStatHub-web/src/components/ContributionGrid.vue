@@ -10,17 +10,9 @@
       </span>
     </div>
 
-    <!-- 贡献网格 -->
+    <!-- Contribution Grid -->
     <div class="contribution-grid">
       <div v-for="(row, rowIndex) in contributionGrid" :key="rowIndex" class="grid-row">
-<!--        <div-->
-<!--            v-for="(cell, cellIndex) in row"-->
-<!--            :key="cellIndex"-->
-<!--            class="grid-cell"-->
-<!--            :class="{ 'has-contributions': cell.count > 0 }"-->
-<!--            :style="{ backgroundColor: getColor(cell.count) }"-->
-<!--            :data-tooltip="cell.date ? `${cell.count} contributions on ${formatDate(cell.date)}` : ''"-->
-<!--        ></div>-->
         <div
             v-for="(cell, cellIndex) in row"
             :key="cellIndex"
@@ -31,7 +23,7 @@
       </div>
     </div>
 
-    <!-- 贡献统计 -->
+    <!-- Contribution Statistics -->
     <div v-if="contributionStats.total > 0" class="contribution-stats">
       <p>今月の貢献数: {{ contributionStats.currentMonth }} / 総貢献数: {{ contributionStats.total }}</p>
     </div>
@@ -42,19 +34,19 @@
 import { ref, computed, onMounted, watch, defineProps, withDefaults } from 'vue';
 import { getContributions } from '@/services/api'
 
-// 定义组件 props
+// コンポーネントプロパティの定義
 const props = withDefaults(defineProps<{
   username: string
 }>(), {
   username: 'VerneZhong'
 })
 
-// 当前年份
+// 今年
 const currentYear = new Date().getFullYear();
 
-// 定义月份显示
+// 月の表示を定義する
 const months = computed(() => {
-  // 获取过去一年的月份
+  // 過去1年間の月を取得する
   const monthNames = [];
   const today = new Date();
   const pastYear = new Date(today);
@@ -69,10 +61,10 @@ const months = computed(() => {
   return monthNames;
 });
 
-// GitHub贡献颜色
+// GitHub contribution colors
 const colors = ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
 
-// 根据贡献数量确定颜色
+// Color based on contribution amount
 function getColor(count: number) {
   if (count === 0) return colors[0];
   if (count <= 3) return colors[1];
@@ -81,13 +73,13 @@ function getColor(count: number) {
   return colors[4];
 }
 
-// 格式化日期为"April 13th"这样的格式
+// Formalization date: "April 13th"
 function formatDate(dateStr: string) {
   const date = new Date(dateStr);
   const month = date.toLocaleString('en', { month: 'long' });
   const day = date.getDate();
 
-  // 添加英文序数后缀(1st, 2nd, 3rd, 4th等)
+  // Added English ordinal numbers (1st, 2nd, 3rd, 4th, etc.)
   let suffix = 'th';
   if (day % 10 === 1 && day !== 11) {
     suffix = 'st';
@@ -100,34 +92,34 @@ function formatDate(dateStr: string) {
   return `${month} ${day}${suffix}`;
 }
 
-// 贡献网格和统计数据
+// Contribution of network data and statistics
 const contributionGrid = ref([]);
 const contributionStats = ref({
   total: 0,
   currentMonth: 0
 });
 
-// 从后端获取数据
+// Later acquisition data
 async function fetchContributionData() {
   try {
     const data = await getContributions(props.username);
 
-    // 更新统计信息
+    // Updated statistics
     contributionStats.value = {
       total: data.totalContributions || 0,
       currentMonth: data.currentMonthContributions || 0
     };
 
-    // 转换数据为网格格式
+    // Convert data to network format
     contributionGrid.value = transformContributionData(data.weeks);
   } catch (error) {
     console.error('获取贡献数据失败:', error);
-    // 加载失败时初始化空网格
+    // When a loss occurs, the first start is empty.
     initializeEmptyGrid();
   }
 }
 
-// 将API返回的周数据转换为网格格式
+// General API return frequency setting
 function transformContributionData(weeks) {
   // 初始化7×53的网格，填充零(每周7天，每年约53周)
   const grid = Array(7).fill().map(() => Array(53).fill().map(() => ({ count: 0, date: null })));
@@ -135,12 +127,17 @@ function transformContributionData(weeks) {
   if (!weeks || !Array.isArray(weeks)) {
     return grid;
   }
-
+  const today = new Date();
   // 用实际贡献数据填充网格
   weeks.forEach((week, weekIndex) => {
     if (week.contributionDays && Array.isArray(week.contributionDays)) {
       week.contributionDays.forEach(day => {
         const date = new Date(day.date);
+        // 检查日期是否在未来
+        if (date > today) {
+          // 对于未来日期，强制将计数设为0
+          day.contributionCount = 0;
+        }
         const dayOfWeek = date.getDay(); // 0(周日)到6(周六)
         if (weekIndex < 53) {
           grid[dayOfWeek][weekIndex] = {
@@ -186,7 +183,6 @@ watch(() => props.username, () => {
   fetchContributionData();
 });
 </script>
-
 <style scoped>
 .contribution-graph {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -231,13 +227,15 @@ watch(() => props.username, () => {
   height: 15px;
   border-radius: 2px;
   position: relative;
+  background-color: #ebedf0;
 }
 
 .grid-cell.has-contributions {
   cursor: pointer;
 }
 
-/* 工具提示样式 */
+/* 统一工具提示样式，移除类选择器的差异 */
+.grid-cell.tooltip-enabled:hover::after,
 .grid-cell.has-contributions:hover::after {
   content: attr(data-tooltip);
   position: absolute;
@@ -255,7 +253,8 @@ watch(() => props.username, () => {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
 
-/* 工具提示箭头 */
+/* 统一小三角形样式 */
+.grid-cell.tooltip-enabled:hover::before,
 .grid-cell.has-contributions:hover::before {
   content: "";
   position: absolute;
@@ -276,12 +275,7 @@ watch(() => props.username, () => {
   color: #57606a;
 }
 
-/* 浅色模式默认颜色 */
-.grid-cell {
-  background-color: #ebedf0;
-}
-
-/* 可选：深色模式 */
+/* 深色模式颜色调整 */
 @media (prefers-color-scheme: dark) {
   .year-header {
     color: #c9d1d9;
@@ -293,49 +287,6 @@ watch(() => props.username, () => {
 
   .contribution-stats {
     color: #8b949e;
-  }
-
-  .grid-cell {
-    background-color: #161b22;
-  }
-
-  .grid-cell.has-contributions:hover::after {
-    background-color: #2d333b;
-    color: #ffffff;
-  }
-
-  .grid-cell.has-contributions:hover::before {
-    border-color: #2d333b transparent transparent transparent;
-  }
-
-  .grid-cell.tooltip-enabled:hover::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #24292f;
-    color: #ffffff;
-    padding: 6px 8px;
-    border-radius: 6px;
-    font-size: 12px;
-    white-space: nowrap;
-    z-index: 10;
-    margin-bottom: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  }
-
-  .grid-cell.tooltip-enabled:hover::before {
-    content: "";
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 5px;
-    border-style: solid;
-    border-color: #24292f transparent transparent transparent;
-    margin-bottom: 3px;
-    z-index: 10;
   }
 }
 </style>
