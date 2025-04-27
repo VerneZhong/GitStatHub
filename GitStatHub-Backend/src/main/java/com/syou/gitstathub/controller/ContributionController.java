@@ -1,5 +1,6 @@
 package com.syou.gitstathub.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.syou.gitstathub.service.GitHubService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +27,12 @@ public class ContributionController {
 
     @GetMapping("/contributions/{username}")
     public ResponseEntity<Map<String, Object>> getContributions(@PathVariable String username) {
-        Map<String, Object> result = gitHubService.getContributions(username);
+        Map<String, Object> result;
+        try {
+            result = gitHubService.getContributions(username);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         return ResponseEntity.ok(result);
     }
 }
