@@ -1,5 +1,6 @@
 package com.syou.gitstathub.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * GitHub service
  * @author verne.zhong
  * @date 2025/04/13
  * @description
@@ -46,7 +48,7 @@ public class GitHubServiceImpl implements GitHubService {
     }
 
     @Override
-    public Map<String, Object> getContributions(String username) {
+    public Map<String, Object> getContributions(String username) throws JsonProcessingException {
         String url = "https://api.github.com/graphql";
         Map<String, Object> body = getStringObjectMap(username);
 
@@ -58,54 +60,49 @@ public class GitHubServiceImpl implements GitHubService {
 
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
-        try {
-            JsonNode root = objectMapper.readTree(response.getBody());
-            JsonNode calendarNode = root.path("data")
-                    .path("user")
-                    .path("contributionsCollection")
-                    .path("contributionCalendar");
+        JsonNode root = objectMapper.readTree(response.getBody());
+        JsonNode calendarNode = root.path("data")
+                .path("user")
+                .path("contributionsCollection")
+                .path("contributionCalendar");
 
-            JsonNode weeksNode = calendarNode.path("weeks");
-            Integer totalContributions = calendarNode.path("totalContributions").asInt();
+        JsonNode weeksNode = calendarNode.path("weeks");
+        Integer totalContributions = calendarNode.path("totalContributions").asInt();
 
-            List<Map<String, Object>> weeks = objectMapper.convertValue(weeksNode, new TypeReference<>() {});
+        List<Map<String, Object>> weeks = objectMapper.convertValue(weeksNode, new TypeReference<>() {
+        });
 
-            // Calculate current month contributions
-            int currentMonthContributions = calculateCurrentMonthContributions(weeks);
+        // Calculate current month contributions
+        int currentMonthContributions = calculateCurrentMonthContributions(weeks);
 
-            return Map.of(
-                    "weeks", weeks,
-                    "totalContributions", totalContributions,
-                    "currentMonthContributions", currentMonthContributions
-            );
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Map.of();
-        }
+        return Map.of(
+                "weeks", weeks,
+                "totalContributions", totalContributions,
+                "currentMonthContributions", currentMonthContributions
+        );
     }
 
     private static Map<String, Object> getStringObjectMap(String username) {
         String query = """
-            query($login: String!) {
-              user(login: $login) {
-                name
-                contributionsCollection {
-                  contributionCalendar {
-                    totalContributions
-                    weeks {
-                      contributionDays {
-                        color
-                        contributionCount
-                        date
-                        weekday
+                    query($login: String!) {
+                      user(login: $login) {
+                        name
+                        contributionsCollection {
+                          contributionCalendar {
+                            totalContributions
+                            weeks {
+                              contributionDays {
+                                color
+                                contributionCount
+                                date
+                                weekday
+                              }
+                            }
+                          }
+                        }
                       }
                     }
-                  }
-                }
-              }
-            }
-        """;
+                """;
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("login", username);

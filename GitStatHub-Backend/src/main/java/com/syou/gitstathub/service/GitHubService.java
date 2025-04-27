@@ -1,5 +1,6 @@
 package com.syou.gitstathub.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.syou.gitstathub.model.RepoInfo;
 
 import java.util.List;
@@ -13,5 +14,5 @@ import java.util.Map;
 public interface GitHubService {
     List<RepoInfo> fetchUserRepos();
 
-    Map<String, Object> getContributions(String username);
+    Map<String, Object> getContributions(String username) throws JsonProcessingException;
 }
