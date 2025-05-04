@@ -1,0 +1,18 @@
+type ContributionDay {
+  date: String
+  contributionCount: Int
+}
+
+type ContributionWeek {
+  contributionDays: [ContributionDay]
+}
+
+type ContributionStats {
+  totalContributions: Int
+  currentMonthContributions: Int
+  weeks: [ContributionWeek]
+}
+
+type Query {
+  contributions(username: String!): ContributionStats
+}

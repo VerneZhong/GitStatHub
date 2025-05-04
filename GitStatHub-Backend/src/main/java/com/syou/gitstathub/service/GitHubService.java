@@ -15,4 +15,6 @@ public interface GitHubService {
     List<RepoInfo> fetchUserRepos();
 
     Map<String, Object> getContributions(String username) throws JsonProcessingException;
+
+
 }
