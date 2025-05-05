@@ -10,19 +10,21 @@
       </span>
     </div>
 
+    <div class="contribution-container">
+
     <!-- Contribution Grid -->
-    <div class="contribution-grid">
-      <div v-for="(row, rowIndex) in displayGrid" :key="rowIndex" class="grid-row">
-        <div
-            v-for="(cell, cellIndex) in row"
-            :key="cellIndex"
-            :class="['grid-cell', 'tooltip-enabled', { 'has-contributions': cell.count > 0 }]"
-            :style="{ backgroundColor: getColor(cell.count) }"
-            :data-tooltip="getTooltip(cell.count, cell.date)"
-        ></div>
+      <div class="contribution-grid">
+        <div v-for="(column, columnIndex) in displayGrid" :key="columnIndex" class="grid-row">
+          <div
+              v-for="(cell, cellIndex) in column"
+              :key="cellIndex"
+              :class="['grid-cell', 'tooltip-enabled', { 'has-contributions': cell.count > 0 }]"
+              :style="{ backgroundColor: getColor(cell.count) }"
+              :data-tooltip="getTooltip(cell.count, cell.date)"
+          ></div>
+        </div>
       </div>
     </div>
-
     <!-- Contribution Statistics -->
     <div v-if="contributionStats.total > 0" class="contribution-stats">
       <p>今月の貢献数: {{ contributionStats.currentMonth }} / 総貢献数: {{ contributionStats.total }}</p>
@@ -31,14 +33,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, defineProps, withDefaults } from 'vue';
-import { getContributions } from '@/services/api'
+import {ref, computed, defineProps, PropType} from 'vue';
 
 // コンポーネントプロパティの定義
-const props = withDefaults(defineProps<{
-  username?: string
-}>(), {
-  username: 'VerneZhong'
+const props = defineProps({
+  weeks: {
+    type: Array as PropType<any[]>,
+    required: true
+  }
 });
 
 // 今年
@@ -100,100 +102,39 @@ function formatDate(dateStr: string) {
 }
 
 // Contribution of network data and statistics
-const contributionGrid = ref([]);
-const displayGrid = ref([]);
 const contributionStats = ref({
   total: 0,
   currentMonth: 0
 });
 
-// Initialize grid
-function initializeGrid() {
-  const today = new Date();
-  const todayDateString = today.toISOString().slice(0, 10);
-
-  const grid = [];
-  for (let i = 0; i < 7; i++) {
-    const row = [];
-    for (let j = 0; j < 52; j++) {
-      row.push({
-        count: 0,
-        date: todayDateString,
-      });
-    }
-    grid.push(row);
-  }
-
-  contributionGrid.value = grid;
-  displayGrid.value = grid;
-}
-
 // Later acquisition data
-async function fetchContributionData() {
-  try {
-    initializeGrid(); // 先初始化一个空网格，确保显示
+const displayGrid = computed(() => {
+  // 週ごとに横に並べる（GitHubスタイル）
+  const grid = [];
 
-    const data = await getContributions(props.username);
+  if (props.weeks) {
+    // 各週を横方向に、各日を縦方向（曜日）に配置
+    props.weeks.forEach(week => {
+      if (week.contributionDays) {
+        const weekData = [];
+        // 曜日順に並べるために、日付からDay of Weekを取得してソート
+        const sortedDays = [...week.contributionDays].sort((a, b) => {
+          return new Date(a.date).getDay() - new Date(b.date).getDay();
+        });
 
-    // Updated statistics
-    contributionStats.value = {
-      total: data.totalContributions || 0,
-      currentMonth: data.currentMonthContributions || 0
-    };
-
-    if (data.weeks && Array.isArray(data.weeks)) {
-      // Convert data to network format
-      const grid = processContributionData(data.weeks);
-      displayGrid.value = grid;
-    }
-  } catch (error) {
-    console.error('获取贡献数据失败:', error);
+        sortedDays.forEach((day: any) => {
+          weekData.push({
+            count: day.contributionCount,
+            date: day.date
+          });
+        });
+        grid.push(weekData);
+      }
+    });
   }
-}
-
-// Process contribution data
-function processContributionData(weeks) {
-  const today = new Date();
-  const todayDateString = today.toISOString().slice(0, 10);
-
-  // 初始化7×53的网格，默认所有格子都可见
-  const grid = Array(7).fill().map(() =>
-      Array(53).fill().map(() => ({
-        count: 0,
-        date: todayDateString,
-      }))
-  );
-
-  if (!weeks || !Array.isArray(weeks)) {
-    return grid;
-  }
-
-  // 用实际贡献数据填充网格
-  weeks.forEach((week, weekIndex) => {
-    if (week.contributionDays && Array.isArray(week.contributionDays)) {
-      week.contributionDays.forEach(day => {
-        if (!day || !day.date) return;
-
-        const date = new Date(day.date);
-        const dateString = day.date;
-        const dayOfWeek = date.getDay(); // 0(周日)到6(周六)
-
-        if (weekIndex < 53 && dayOfWeek >= 0 && dayOfWeek < 7) {
-          // 超过今天的日期设为不可见
-          const isVisible = dateString <= todayDateString;
-
-          grid[dayOfWeek][weekIndex] = {
-            count: day.contributionCount || 0,
-            date: day.date,
-            isVisible: isVisible
-          };
-        }
-      });
-    }
-  });
 
   return grid;
-}
+});
 
 function getTooltip(count: number, dateStr: string) {
   if (!dateStr) return '';
@@ -203,17 +144,6 @@ function getTooltip(count: number, dateStr: string) {
       ? `${count} contributions on ${formatted}`
       : `No contributions on ${formatted}`;
 }
-
-// 组件挂载时获取数据
-onMounted(() => {
-  initializeGrid(); // 确保先有个默认网格
-  fetchContributionData();
-});
-
-// 当用户名变化时重新获取数据
-watch(() => props.username, () => {
-  fetchContributionData();
-});
 </script>
 
 <style scoped>
@@ -244,14 +174,34 @@ watch(() => props.username, () => {
   color: #57606a;
 }
 
-.contribution-grid {
+.contribution-container {
+  display: flex;
+}
+
+.weekday-labels {
   display: flex;
   flex-direction: column;
+  justify-content: space-around;
+  margin-right: 4px;
+}
+
+.weekday-label {
+  font-size: 12px;
+  color: #57606a;
+  height: 15px;
+  line-height: 15px;
+}
+
+.contribution-grid {
+  display: flex;
+  flex-direction: row;
   gap: 2px;
+  overflow-x: auto;
 }
 
 .grid-row {
   display: flex;
+  flex-direction: column;
   gap: 2px;
 }
 
@@ -314,12 +264,19 @@ watch(() => props.username, () => {
     color: #c9d1d9;
   }
 
-  .month-label {
+  .month-label,
+  .weekday-label {
     color: #8b949e;
   }
 
   .contribution-stats {
     color: #8b949e;
   }
+}
+
+.contribution-stats {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #586069;
 }
 </style>
