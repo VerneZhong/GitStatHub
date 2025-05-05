@@ -12,14 +12,14 @@
 
     <!-- Contribution Grid -->
     <div class="contribution-grid">
-      <div v-for="(row, rowIndex) in contributionGrid" :key="rowIndex" class="grid-row">
+      <div v-for="(row, rowIndex) in displayGrid" :key="rowIndex" class="grid-row">
         <div
             v-for="(cell, cellIndex) in row"
             :key="cellIndex"
             :class="['grid-cell', 'tooltip-enabled', { 'has-contributions': cell.count > 0 }]"
             :style="{ backgroundColor: getColor(cell.count) }"
-            :data-tooltip="cell.date ? getTooltip(cell.count, cell.date) : ''"
-        />
+            :data-tooltip="getTooltip(cell.count, cell.date)"
+        ></div>
       </div>
     </div>
 
@@ -36,10 +36,10 @@ import { getContributions } from '@/services/api'
 
 // コンポーネントプロパティの定義
 const props = withDefaults(defineProps<{
-  username: string
+  username?: string
 }>(), {
   username: 'VerneZhong'
-})
+});
 
 // 今年
 const currentYear = new Date().getFullYear();
@@ -75,33 +75,64 @@ function getColor(count: number) {
 
 // Formalization date: "April 13th"
 function formatDate(dateStr: string) {
-  const date = new Date(dateStr);
-  const month = date.toLocaleString('en', { month: 'long' });
-  const day = date.getDate();
+  if (!dateStr) return '';
 
-  // Added English ordinal numbers (1st, 2nd, 3rd, 4th, etc.)
-  let suffix = 'th';
-  if (day % 10 === 1 && day !== 11) {
-    suffix = 'st';
-  } else if (day % 10 === 2 && day !== 12) {
-    suffix = 'nd';
-  } else if (day % 10 === 3 && day !== 13) {
-    suffix = 'rd';
+  try {
+    const date = new Date(dateStr);
+    const month = date.toLocaleString('en', { month: 'long' });
+    const day = date.getDate();
+
+    // Added English ordinal numbers (1st, 2nd, 3rd, 4th, etc.)
+    let suffix = 'th';
+    if (day % 10 === 1 && day !== 11) {
+      suffix = 'st';
+    } else if (day % 10 === 2 && day !== 12) {
+      suffix = 'nd';
+    } else if (day % 10 === 3 && day !== 13) {
+      suffix = 'rd';
+    }
+
+    return `${month} ${day}${suffix}`;
+  } catch (error) {
+    console.error('日付のフォーマットに失敗:', error);
+    return dateStr;
   }
-
-  return `${month} ${day}${suffix}`;
 }
 
 // Contribution of network data and statistics
 const contributionGrid = ref([]);
+const displayGrid = ref([]);
 const contributionStats = ref({
   total: 0,
   currentMonth: 0
 });
 
+// Initialize grid
+function initializeGrid() {
+  const today = new Date();
+  const todayDateString = today.toISOString().slice(0, 10);
+
+  const grid = [];
+  for (let i = 0; i < 7; i++) {
+    const row = [];
+    for (let j = 0; j < 52; j++) {
+      row.push({
+        count: 0,
+        date: todayDateString,
+      });
+    }
+    grid.push(row);
+  }
+
+  contributionGrid.value = grid;
+  displayGrid.value = grid;
+}
+
 // Later acquisition data
 async function fetchContributionData() {
   try {
+    initializeGrid(); // 先初始化一个空网格，确保显示
+
     const data = await getContributions(props.username);
 
     // Updated statistics
@@ -110,39 +141,51 @@ async function fetchContributionData() {
       currentMonth: data.currentMonthContributions || 0
     };
 
-    // Convert data to network format
-    contributionGrid.value = transformContributionData(data.weeks);
+    if (data.weeks && Array.isArray(data.weeks)) {
+      // Convert data to network format
+      const grid = processContributionData(data.weeks);
+      displayGrid.value = grid;
+    }
   } catch (error) {
     console.error('获取贡献数据失败:', error);
-    // When a loss occurs, the first start is empty.
-    initializeEmptyGrid();
   }
 }
 
-// General API return frequency setting
-function transformContributionData(weeks) {
-  // 初始化7×53的网格，填充零(每周7天，每年约53周)
-  const grid = Array(7).fill().map(() => Array(53).fill().map(() => ({ count: 0, date: null })));
+// Process contribution data
+function processContributionData(weeks) {
+  const today = new Date();
+  const todayDateString = today.toISOString().slice(0, 10);
+
+  // 初始化7×53的网格，默认所有格子都可见
+  const grid = Array(7).fill().map(() =>
+      Array(53).fill().map(() => ({
+        count: 0,
+        date: todayDateString,
+      }))
+  );
 
   if (!weeks || !Array.isArray(weeks)) {
     return grid;
   }
-  const today = new Date();
+
   // 用实际贡献数据填充网格
   weeks.forEach((week, weekIndex) => {
     if (week.contributionDays && Array.isArray(week.contributionDays)) {
       week.contributionDays.forEach(day => {
+        if (!day || !day.date) return;
+
         const date = new Date(day.date);
-        // 检查日期是否在未来
-        if (date > today) {
-          // 对于未来日期，强制将计数设为0
-          day.contributionCount = 0;
-        }
+        const dateString = day.date;
         const dayOfWeek = date.getDay(); // 0(周日)到6(周六)
-        if (weekIndex < 53) {
+
+        if (weekIndex < 53 && dayOfWeek >= 0 && dayOfWeek < 7) {
+          // 超过今天的日期设为不可见
+          const isVisible = dateString <= todayDateString;
+
           grid[dayOfWeek][weekIndex] = {
-            count: day.contributionCount,
-            date: day.date
+            count: day.contributionCount || 0,
+            date: day.date,
+            isVisible: isVisible
           };
         }
       });
@@ -152,20 +195,9 @@ function transformContributionData(weeks) {
   return grid;
 }
 
-// 初始化空网格（用于加载失败或等待数据时）
-function initializeEmptyGrid() {
-  const grid = [];
-  for (let i = 0; i < 7; i++) {
-    const row = [];
-    for (let j = 0; j < 53; j++) {
-      row.push({ count: 0, date: null });
-    }
-    grid.push(row);
-  }
-  contributionGrid.value = grid;
-}
-
 function getTooltip(count: number, dateStr: string) {
+  if (!dateStr) return '';
+
   const formatted = formatDate(dateStr);
   return count > 0
       ? `${count} contributions on ${formatted}`
@@ -174,8 +206,8 @@ function getTooltip(count: number, dateStr: string) {
 
 // 组件挂载时获取数据
 onMounted(() => {
-  initializeEmptyGrid(); // 先初始化空网格
-  fetchContributionData(); // 然后获取真实数据
+  initializeGrid(); // 确保先有个默认网格
+  fetchContributionData();
 });
 
 // 当用户名变化时重新获取数据
@@ -183,6 +215,7 @@ watch(() => props.username, () => {
   fetchContributionData();
 });
 </script>
+
 <style scoped>
 .contribution-graph {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
