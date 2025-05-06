@@ -175,28 +175,15 @@ function getTooltip(count: number, dateStr: string) {
 }
 
 .contribution-container {
-  display: flex;
-}
-
-.weekday-labels {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  margin-right: 4px;
-}
-
-.weekday-label {
-  font-size: 12px;
-  color: #57606a;
-  height: 15px;
-  line-height: 15px;
+  overflow: visible;
 }
 
 .contribution-grid {
   display: flex;
   flex-direction: row;
   gap: 2px;
-  overflow-x: auto;
+  overflow-x: visible;
+  position: relative;
 }
 
 .grid-row {
@@ -217,38 +204,70 @@ function getTooltip(count: number, dateStr: string) {
   cursor: pointer;
 }
 
-/* 统一工具提示样式，移除类选择器的差异 */
+/* GitHub 风格的工具提示 */
 .grid-cell.tooltip-enabled:hover::after,
 .grid-cell.has-contributions:hover::after {
   content: attr(data-tooltip);
   position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  z-index: 1000;
   background-color: #24292f;
   color: #ffffff;
   padding: 6px 8px;
   border-radius: 6px;
   font-size: 12px;
   white-space: nowrap;
-  z-index: 10;
-  margin-bottom: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
+  /* 固定显示在鼠标上方 */
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none; /* 确保鼠标事件不被提示拦截 */
 }
 
-/* 统一小三角形样式 */
+/* GitHub 风格的三角形 */
 .grid-cell.tooltip-enabled:hover::before,
 .grid-cell.has-contributions:hover::before {
   content: "";
   position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  z-index: 1000;
   border-width: 5px;
   border-style: solid;
   border-color: #24292f transparent transparent transparent;
-  margin-bottom: 3px;
-  z-index: 10;
+
+  /* 固定显示在鼠标上方 */
+  bottom: calc(100% + 0px);
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none; /* 确保鼠标事件不被提示拦截 */
+}
+
+/* 解决顶部被截断的问题 */
+.grid-cell:hover::after {
+  /* 使用 transform 避免被截断 */
+  transform: translateX(-50%) translateY(0);
+
+  /* 使用 top 而不是 bottom 定位，防止被截断 */
+  /* 对于顶部单元格，使用固定位置计算 */
+  top: -45px; /* 可根据实际提示框大小调整 */
+  bottom: auto;
+}
+
+.grid-cell:hover::before {
+  /* 使用 top 而不是 bottom 定位，防止被截断 */
+  top: -15px; /* 可根据实际三角形大小调整 */
+  bottom: auto;
+}
+
+/* 确保提示框不会超出容器边界 */
+@media (max-width: 768px) {
+  .grid-cell:hover::after {
+    /* 在小屏幕上可能需要调整位置 */
+    transform: translateX(-50%) translateY(0);
+    max-width: 200px; /* 限制宽度 */
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
 }
 
 /* 贡献统计信息 */
