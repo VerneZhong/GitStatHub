@@ -1,8 +1,5 @@
 <template>
   <div class="contribution-graph">
-    <!-- 年の見出し -->
-    <h2 class="year-header">{{ currentYear }}年</h2>
-
     <!-- 月のラベル -->
     <div class="month-labels">
       <span v-for="(month, index) in months" :key="index" class="month-label">
@@ -24,11 +21,6 @@
         </div>
       </div>
     </div>
-
-    <!-- 貢献統計 -->
-    <div v-if="contributionStats.total > 0" class="contribution-stats">
-      <p>今月の貢献数: {{ contributionStats.currentMonth }} / 総貢献数: {{ contributionStats.total }}</p>
-    </div>
   </div>
 </template>
 
@@ -42,9 +34,6 @@ const props = defineProps({
     required: true
   }
 });
-
-// 現在の年
-const currentYear = new Date().getFullYear();
 
 // 月の表示を定義
 const months = computed(() => {
@@ -100,12 +89,6 @@ function formatDate(dateStr: string) {
   }
 }
 
-// 貢献データと統計情報
-const contributionStats = ref({
-  total: 0,
-  currentMonth: 0
-});
-
 // 表示用グリッドデータを取得
 const displayGrid = computed(() => {
   const grid = [];
@@ -153,14 +136,6 @@ function getTooltip(count: number, dateStr: string) {
   padding: 20px 0;
 }
 
-/* 年の見出し */
-.year-header {
-  font-size: 24px;
-  color: #57606a;
-  margin-bottom: 8px;
-  font-weight: normal;
-}
-
 /* 月のラベルエリア */
 .month-labels {
   display: flex;
@@ -205,13 +180,12 @@ function getTooltip(count: number, dateStr: string) {
   background-color: #ebedf0;
 }
 
-.grid-cell.has-contributions {
+.grid-cell {
   cursor: pointer;
 }
 
 /* GitHub風ツールチップ */
-.grid-cell.tooltip-enabled:hover::after,
-.grid-cell.has-contributions:hover::after {
+.grid-cell.tooltip-enabled:hover::after {
   content: attr(data-tooltip);
   position: absolute;
   z-index: 1000;
@@ -230,8 +204,7 @@ function getTooltip(count: number, dateStr: string) {
 }
 
 /* ツールチップの三角形 */
-.grid-cell.tooltip-enabled:hover::before,
-.grid-cell.has-contributions:hover::before {
+.grid-cell.tooltip-enabled:hover::before {
   content: "";
   position: absolute;
   z-index: 1000;
@@ -267,25 +240,9 @@ function getTooltip(count: number, dateStr: string) {
   }
 }
 
-/* 統計情報表示 */
-.contribution-stats {
-  margin-top: 12px;
-  font-size: 14px;
-  color: #586069;
-}
-
 /* ダークモード調整 */
 @media (prefers-color-scheme: dark) {
-  .year-header {
-    color: #c9d1d9;
-  }
-
-  .month-label,
-  .weekday-label {
-    color: #8b949e;
-  }
-
-  .contribution-stats {
+  .month-label {
     color: #8b949e;
   }
 }
