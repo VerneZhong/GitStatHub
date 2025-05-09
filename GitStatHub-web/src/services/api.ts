@@ -20,6 +20,7 @@ export const getContributions = async (username: string) => {
     return res.data
 }
 
-export const getContributionsByYear = (username: string, year: number) => {
-    return api.get(`/api/github/contributionsByYear?username=${username}&year=${year}`);
+export const getContributionsByYear = async (username: string, year: number) => {
+    const  res = await api.get(`/api/github/contributionsByYear?username=${username}&year=${year}`);
+    return res.data;
 };

@@ -13,7 +13,10 @@
       </button>
     </div>
     <p>今月の貢献数: {{ currentMonthTotal }} / 総貢献数: {{ totalContributions }}</p>
-    <p>{{ totalContributions }} contributions in the last year</p>
+    <p>
+      {{ totalContributions }} contributions
+      in the {{ selectedYear === new Date().getFullYear() ? 'this year' : selectedYear }}
+    </p>
     <ContributionGrid v-if="calendar && selectedYear" :weeks="calendar.weeks" />
   </div>
 </template>
