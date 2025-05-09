@@ -3,10 +3,7 @@ package com.syou.gitstathub.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.syou.gitstathub.service.GitHubService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -34,5 +31,16 @@ public class ContributionController {
             throw new RuntimeException(e);
         }
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/contributionsByYear")
+    public Map<String, Object> getContributionsByYear(
+            @RequestParam String username,
+            @RequestParam(required = false) Integer year
+    ) throws JsonProcessingException {
+        if (year == null) {
+            year = java.time.Year.now().getValue();
+        }
+        return gitHubService.getContributionsByYear(username, year);
     }
 }

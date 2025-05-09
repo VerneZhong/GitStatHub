@@ -32,7 +32,6 @@ public class GitHubServiceImpl implements GitHubService {
     private String githubToken;
 
     private final GitHubApiHelper gitHubApiHelper;
-
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
@@ -134,5 +133,90 @@ public class GitHubServiceImpl implements GitHubService {
         return count;
     }
 
+    /**
+     * 根据年份获取贡献数据
+     * @param username
+     * @param year
+     * @return
+     * @throws JsonProcessingException
+     */
+    @Override
+    public Map<String, Object> getContributionsByYear(String username, Integer year) throws JsonProcessingException {
+        // 时间范围
+        String from = year + "-01-01T00:00:00Z";
+        String to = year + "-12-31T23:59:59Z";
+
+        // GraphQL 查询语句
+        String query = """
+        query ($username: String!, $from: DateTime!, $to: DateTime!) {
+          user(login: $username) {
+            contributionsCollection(from: $from, to: $to) {
+              contributionCalendar {
+                totalContributions
+                weeks {
+                  contributionDays {
+                    color
+                    contributionCount
+                    date
+                    weekday
+                  }
+                }
+              }
+            }
+          }
+        }
+        """;
+
+        // 构建 GraphQL 请求体
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> request = new HashMap<>();
+        request.put("query", query);
+        request.put("variables", Map.of(
+                "username", username,
+                "from", from,
+                "to", to
+        ));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(githubToken);
+        HttpEntity<String> entity = new HttpEntity<>(mapper.writeValueAsString(request), headers);
+
+        // 请求 GitHub GraphQL
+        ResponseEntity<JsonNode> response = restTemplate.postForEntity(
+                "https://api.github.com/graphql",
+                entity,
+                JsonNode.class
+        );
+
+        // 提取数据
+        JsonNode root = response.getBody();
+        JsonNode calendar = root
+                .path("data")
+                .path("user")
+                .path("contributionsCollection")
+                .path("contributionCalendar");
+
+        JsonNode weeks = calendar.path("weeks");
+        int total = calendar.path("totalContributions").asInt();
+
+        // 本月贡献数
+        int currentMonth = LocalDate.now().getMonthValue();
+        int currentYear = LocalDate.now().getYear();
+        int thisMonthCount = 0;
+
+        for (JsonNode week : weeks) {
+            for (JsonNode day : week.path("contributionDays")) {
+                LocalDate date = LocalDate.parse(day.path("date").asText());
+                if (date.getYear() == currentYear && date.getMonthValue() == currentMonth) {
+                    thisMonthCount += day.path("contributionCount").asInt();
+                }
+            }
+        }
+        return Map.of(
+                "weeks", weeks,
+                "totalContributions", total,
+                "currentMonthContributions", thisMonthCount);
+    }
 
 }

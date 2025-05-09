@@ -16,5 +16,5 @@ public interface GitHubService {
 
     Map<String, Object> getContributions(String username) throws JsonProcessingException;
 
-
+    Map<String, Object> getContributionsByYear(String username, Integer year) throws JsonProcessingException;
 }
