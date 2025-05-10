@@ -27,8 +27,10 @@ public class SyncTask {
         this.repoInfoRepository = repoInfoRepository;
     }
 
-    // 毎日午前3時に実行される例
-    @Scheduled(cron = "0 0 3 * * *")
+    /**
+     * 時間毎に実行される
+     */
+    @Scheduled(cron = "0 0 * * * *")
     public void syncGitHubData() {
         log.info("[SyncTask] GitHubデータの同期を開始...");
 
