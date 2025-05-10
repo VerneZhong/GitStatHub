@@ -7,7 +7,7 @@
       <img :src="user.avatarUrl" alt="avatar" class="avatar"/>
       <p class="username">
         {{ user.login }}
-        <a :href="`https://github.com/${user.login}`" class="repo-link">GitHub で見る</a>
+        <a :href="`https://github.com/${user.login}`" class="repo-link" target="_blank" rel="noopener noreferrer">GitHub で見る</a>
       </p>
     </div>
 
