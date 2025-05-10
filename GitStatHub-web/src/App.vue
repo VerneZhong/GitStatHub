@@ -20,7 +20,18 @@
 
     <!-- 🔽 コンテンツエリア -->
     <div v-if="viewTab === 'list'" class="repo-list">
-      <RepoCard v-for="repo in repos" :key="repo.id" :repo="repo" />
+      <RepoCard v-for="repo in paginatedRepos" :key="repo.id" :repo="repo" />
+
+      <!-- ページングボタン -->
+      <div class="pagination">
+        <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1" class="page-btn">
+          ← 前へ
+        </button>
+        <span class="page-info">ページ {{ currentPage }} / {{ totalPages }}</span>
+        <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-btn">
+          次へ →
+        </button>
+      </div>
     </div>
     <div v-else-if="viewTab === 'chart'">
       <RepoLanguageChart :repos="repos" />
@@ -32,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { getRepos } from '@/services/api'
 import RepoCard from '@/components/RepoCard.vue'
 import RepoLanguageChart from '@/components/RepoLanguageChart.vue'
@@ -51,6 +62,19 @@ onMounted(async () => {
     console.error('GitHub リポジトリの取得に失敗しました:', err)
   }
 })
+
+const reposPerPage = 10
+const currentPage = ref(1)
+const totalPages = computed(() => Math.ceil(repos.value.length / reposPerPage))
+const paginatedRepos = computed(() =>
+    repos.value.slice((currentPage.value - 1) * reposPerPage, currentPage.value * reposPerPage)
+)
+
+function goToPage(page: number) {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+  }
+}
 </script>
 
 <style scoped>
@@ -60,22 +84,6 @@ onMounted(async () => {
   padding: 2rem;
   font-family: 'Segoe UI', sans-serif;
   text-align: center;
-}
-
-.toggle-btn {
-  margin-top: 1rem;
-  margin-bottom: 1.5rem;
-  padding: 0.5rem 1.2rem;
-  background-color: #007acc;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s;
-}
-.toggle-btn:hover {
-  background-color: #005fa3;
 }
 
 .repo-list {
@@ -94,13 +102,6 @@ onMounted(async () => {
 }
 .repo-link:hover {
   text-decoration: underline;
-}
-.card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .tab-buttons {
@@ -123,5 +124,39 @@ onMounted(async () => {
 .tab-buttons button.active {
   background-color: #007acc;
   color: white;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.page-btn {
+  padding: 0.5rem 1rem;
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.page-btn:hover:not(:disabled) {
+  background-color: #e5e7eb;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-info {
+  min-width: 110px;
+  text-align: center;
 }
 </style>
