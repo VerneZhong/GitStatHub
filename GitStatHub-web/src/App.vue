@@ -20,31 +20,29 @@
     </div>
 
     <!-- 🔽 コンテンツエリア -->
-    <div v-if="viewTab === 'list'" class="repo-list">
-      <RepoCard v-for="repo in paginatedRepos" :key="repo.id" :repo="repo"/>
+    <div v-if="viewTab === 'list'" class="repo-section">
+      <div class="repo-list">
+        <RepoCard v-for="repo in paginatedRepos" :key="repo.id" :repo="repo" />
+      </div>
 
       <!-- ページングボタン -->
-      <!-- pagination section -->
       <div class="pagination">
         <button @click="goToPage(1)" :disabled="currentPage === 1" class="page-btn">≪</button>
         <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1" class="page-btn">←</button>
-        <span class="page-info">
-          ページ
+        <span class="page-info">ページ
           <input
-              v-model.number="inputPage"
-              @keyup.enter="jumpToPage"
-              type="number"
-              min="1"
-              :max="totalPages"
-              class="page-input"
-          />
-          / {{ totalPages }}
+            v-model.number="inputPage"
+            @keyup.enter="jumpToPage"
+            type="number"
+            min="1"
+            :max="totalPages"
+            class="page-input" /> / {{ totalPages }}
         </span>
-
         <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-btn">→</button>
         <button @click="goToPage(totalPages)" :disabled="currentPage === totalPages" class="page-btn">≫</button>
       </div>
     </div>
+
     <div v-else-if="viewTab === 'chart'">
       <RepoLanguageChart :repos="repos"/>
     </div>
@@ -78,7 +76,7 @@ onMounted(async () => {
   }
 })
 
-const reposPerPage = 10
+const reposPerPage = 5
 const currentPage = ref(1)
 const totalPages = computed(() => Math.ceil(repos.value.length / reposPerPage))
 const paginatedRepos = computed(() =>
@@ -116,11 +114,18 @@ function jumpToPage() {
   text-align: center;
 }
 
-.repo-list {
+.repo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin-top: 2rem;
+}
+
+.repo-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
+  width: 100%;
 }
 
 .repo-link {
@@ -158,13 +163,11 @@ function jumpToPage() {
 }
 
 .pagination {
+  margin-top: 3rem;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1rem;
-  margin-top: 2rem;
-  font-size: 0.95rem;
-  font-weight: 500;
 }
 
 .page-btn {
