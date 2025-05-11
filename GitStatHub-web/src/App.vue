@@ -7,7 +7,8 @@
       <img :src="user.avatarUrl" alt="avatar" class="avatar"/>
       <p class="username">
         {{ user.login }}
-        <a :href="`https://github.com/${user.login}`" class="repo-link" target="_blank" rel="noopener noreferrer">GitHub で見る</a>
+        <a :href="`https://github.com/${user.login}`" class="repo-link" target="_blank" rel="noopener noreferrer">GitHub
+          で見る</a>
       </p>
     </div>
 
@@ -20,39 +21,53 @@
 
     <!-- 🔽 コンテンツエリア -->
     <div v-if="viewTab === 'list'" class="repo-list">
-      <RepoCard v-for="repo in paginatedRepos" :key="repo.id" :repo="repo" />
+      <RepoCard v-for="repo in paginatedRepos" :key="repo.id" :repo="repo"/>
 
       <!-- ページングボタン -->
+      <!-- pagination section -->
       <div class="pagination">
-        <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1" class="page-btn">
-          ← 前へ
-        </button>
-        <span class="page-info">ページ {{ currentPage }} / {{ totalPages }}</span>
-        <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-btn">
-          次へ →
-        </button>
+        <button @click="goToPage(1)" :disabled="currentPage === 1" class="page-btn">≪</button>
+        <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1" class="page-btn">←</button>
+        <span class="page-info">
+          ページ
+          <input
+              v-model.number="inputPage"
+              @keyup.enter="jumpToPage"
+              type="number"
+              min="1"
+              :max="totalPages"
+              class="page-input"
+          />
+          / {{ totalPages }}
+        </span>
+
+        <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-btn">→</button>
+        <button @click="goToPage(totalPages)" :disabled="currentPage === totalPages" class="page-btn">≫</button>
       </div>
     </div>
     <div v-else-if="viewTab === 'chart'">
-      <RepoLanguageChart :repos="repos" />
+      <RepoLanguageChart :repos="repos"/>
     </div>
     <div v-else>
-      <ContributionCalendar :username="user.login" />
+      <ContributionCalendar :username="user.login"/>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
-import { getRepos } from '@/services/api'
+import {onMounted, ref, computed, watch} from 'vue'
+import {getRepos} from '@/services/api'
 import RepoCard from '@/components/RepoCard.vue'
 import RepoLanguageChart from '@/components/RepoLanguageChart.vue'
 import ContributionCalendar from '@/components/ContributionCalendar.vue'
-import type { RepoInfo } from '@/types'
+import type {RepoInfo} from '@/types'
 
 const repos = ref<RepoInfo[]>([])
 const viewTab = ref<'list' | 'chart' | 'calendar'>('list')
-const user = ref({ login: 'VerneZhong', avatarUrl: 'https://avatars.githubusercontent.com/u/28047190?s=400&u=aa42d63223ab9dacd73967056a49f1e69149071d&v=4' })
+const user = ref({
+  login: 'VerneZhong',
+  avatarUrl: 'https://avatars.githubusercontent.com/u/28047190?s=400&u=aa42d63223ab9dacd73967056a49f1e69149071d&v=4'
+})
 
 onMounted(async () => {
   try {
@@ -73,6 +88,21 @@ const paginatedRepos = computed(() =>
 function goToPage(page: number) {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page
+  }
+}
+
+const inputPage = ref(1)
+
+watch(currentPage, (newPage) => {
+  inputPage.value = newPage
+})
+
+function jumpToPage() {
+  if (inputPage.value >= 1 && inputPage.value <= totalPages.value) {
+    goToPage(inputPage.value)
+  } else {
+    alert(`1 〜 ${totalPages.value} の間で入力してください`)
+    inputPage.value = currentPage.value
   }
 }
 </script>
@@ -100,6 +130,7 @@ function goToPage(page: number) {
   font-size: 0.875rem;
   text-decoration: none;
 }
+
 .repo-link:hover {
   text-decoration: underline;
 }
@@ -158,5 +189,15 @@ function goToPage(page: number) {
 .page-info {
   min-width: 110px;
   text-align: center;
+}
+
+.page-input {
+  width: 3rem;
+  text-align: center;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  padding: 0.25rem;
+  margin: 0 0.25rem;
+  font-size: 0.9rem;
 }
 </style>
