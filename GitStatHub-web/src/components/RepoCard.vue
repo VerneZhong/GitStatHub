@@ -15,8 +15,9 @@
       </div>
     </div>
 
-    <p>🌐 {{ repo.language || 'N/A' }} ｜ ⭐ {{ repo.stargazersCount }}</p>
-    <p><strong>更新日:</strong> {{ formatDate(repo.updatedAt) }}</p>
+    <p><strong>Languages：</strong> {{ repo.language || 'N/A' }}</p>
+    <p><strong>Stars：</strong> {{ repo.stargazersCount }}</p>
+    <p><strong>Update date:</strong> {{ formatDate(repo.updatedAt) }}</p>
   </div>
 </template>
 
