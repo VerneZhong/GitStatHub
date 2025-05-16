@@ -63,3 +63,53 @@ export const getContributionsByYear = async (username: string, year: number) => 
         throw err
     }
 }
+
+/**
+ * ログインする
+ * @param username
+ * @param password
+ */
+export const login = async (username: string, password: string) => {
+    try {
+        const res = await api.post('/api/auth/login', { username, password })
+        return res.data // e.g. { token: "xxxxx" }
+    } catch (err) {
+        console.error('Login failed:', err)
+        throw err
+    }
+}
+
+/**
+ * ログアウトする
+ */
+export const logout = async () => {
+    try {
+        const res = await api.post('/api/auth/logout')
+        return res.data
+    } catch (err) {
+        console.error('Logout failed:', err)
+        throw err
+    }
+}
+
+/**
+ * ログイン状態をチェックする
+ */
+export const checkLogin = async () => {
+    try {
+        const res = await api.get('/api/auth/check')
+        return res.data // e.g. { loggedIn: true }
+    } catch (err) {
+        console.error('Check login failed:', err)
+        throw err
+    }
+}
+
+// 追加：リクエストごとに Authorization ヘッダーを設定
+api.interceptors.request.use(config => {
+    const token = localStorage.getItem('authToken')
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+})

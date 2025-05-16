@@ -24,4 +24,5 @@ cd gitstathub-web
 npm install
 npm install axios
 npm install vue-echarts echarts
+npm install vue-router@4
 npm run dev

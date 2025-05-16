@@ -29,7 +29,7 @@ public class ContributionResolver {
             List<ContributionDay> days = new ArrayList<>();
             for (int j = 0; j < 7; j++) {
                 LocalDate date = start.plusDays(i * 7L + j);
-                int count = (int) (Math.random() * 10); // 可替换为 GitHub 查询数据
+                int count = (int) (Math.random() * 10);
                 days.add(new ContributionDay(date.toString(), count));
             }
             week.setContributionDays(days);
