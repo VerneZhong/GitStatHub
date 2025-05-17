@@ -1,12 +1,33 @@
 <template>
-  <div class="login-container">
-    <h2>🔐 GitStatHub ログイン</h2>
-    <form @submit.prevent="handleLogin">
-      <input v-model="username" placeholder="ユーザー名" required />
-      <input v-model="password" type="password" placeholder="パスワード" required />
-      <button type="submit">ログイン</button>
-      <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-    </form>
+  <div class="min-h-screen flex items-center justify-center bg-gray-100">
+    <div class="bg-white p-10 rounded-2xl shadow-xl w-full max-w-md">
+      <h2 class="text-2xl font-bold text-center mb-6">
+        🔐 GitStatHub ログイン
+      </h2>
+      <form @submit.prevent="handleLogin" class="space-y-4">
+        <input
+            v-model="username"
+            type="text"
+            placeholder="ユーザー名"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <input
+            v-model="password"
+            type="password"
+            placeholder="パスワード"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+            type="submit"
+            class="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
+        >
+          ログイン
+        </button>
+      </form>
+      <p v-if="errorMessage" class="text-red-500 text-sm mt-4 text-center">
+        {{ errorMessage }}
+      </p>
+    </div>
   </div>
 </template>
 
