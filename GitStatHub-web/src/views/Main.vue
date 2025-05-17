@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import {onMounted, ref, computed, watch} from 'vue'
-import {getRepos} from '@/services/api'
+import {getRepos, checkLogin} from '@/services/api'
 import RepoCard from '@/components/RepoCard.vue'
 import RepoLanguageChart from '@/components/RepoLanguageChart.vue'
 import ContributionCalendar from '@/components/ContributionCalendar.vue'
@@ -106,6 +106,12 @@ function jumpToPage() {
 </script>
 
 <style scoped>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f9f9;
+}
 .app-container {
   max-width: 960px;
   margin: 0 auto;

@@ -11,12 +11,24 @@ const api = axios.create({
     timeout: 10000, // リクエストタイムアウトを10秒に設定
 })
 
-// Optional unified interceptor
+// interceptor
+api.interceptors.request.use(config => {
+    const token = localStorage.getItem('authToken')
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+})
+
 api.interceptors.response.use(
-    res => res,
-    err => {
-        console.error('API Error:', err)
-        return Promise.reject(err)
+    response => response,
+    error => {
+        if (error.response && error.response.status === 403) {
+            // 登录过期，清除 token 并跳转登录页
+            localStorage.removeItem('authToken')
+            window.location.href = '/login'
+        }
+        return Promise.reject(error)
     }
 )
 
@@ -72,7 +84,7 @@ export const getContributionsByYear = async (username: string, year: number) => 
 export const login = async (username: string, password: string) => {
     try {
         const res = await api.post('/api/auth/login', { username, password })
-        return res.data // e.g. { token: "xxxxx" }
+        return res.data
     } catch (err) {
         console.error('Login failed:', err)
         throw err
@@ -104,12 +116,3 @@ export const checkLogin = async () => {
         throw err
     }
 }
-
-// 追加：リクエストごとに Authorization ヘッダーを設定
-api.interceptors.request.use(config => {
-    const token = localStorage.getItem('authToken')
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-})

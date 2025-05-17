@@ -52,27 +52,3 @@ const handleLogin = async () => {
   }
 }
 </script>
-
-<style scoped>
-.login-container {
-  max-width: 400px;
-  margin: 5rem auto;
-  padding: 2rem;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  text-align: center;
-}
-input {
-  display: block;
-  width: 100%;
-  margin: 1rem 0;
-  padding: 0.5rem;
-}
-button {
-  padding: 0.5rem 1rem;
-}
-.error {
-  color: red;
-  margin-top: 1rem;
-}
-</style>
