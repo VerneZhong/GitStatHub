@@ -47,6 +47,7 @@ const handleLogin = async () => {
     localStorage.setItem('authToken', res.token)
     router.push('/app') // 登录成功后跳转
   } catch (err) {
+    console.error(err)
     errorMessage.value = 'ログインに失敗しました'
   }
 }

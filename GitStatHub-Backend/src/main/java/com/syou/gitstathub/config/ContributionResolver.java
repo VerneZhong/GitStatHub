@@ -1,8 +1,8 @@
 package com.syou.gitstathub.config;
 
-import com.syou.gitstathub.model.ContributionDay;
-import com.syou.gitstathub.model.ContributionStats;
-import com.syou.gitstathub.model.ContributionWeek;
+import com.syou.gitstathub.dto.ContributionDay;
+import com.syou.gitstathub.dto.ContributionStats;
+import com.syou.gitstathub.dto.ContributionWeek;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Component;

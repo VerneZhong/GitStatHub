@@ -1,4 +1,4 @@
-package com.syou.gitstathub.model;
+package com.syou.gitstathub.dto;
 
 import lombok.Data;
 
