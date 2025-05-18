@@ -1,52 +1,57 @@
 <!-- src/App.vue -->
 <template>
-  <div class="app-container">
-    <h1>📊 GitStatHub</h1>
-    <p>桜影 の GitHub プロジェクト一覧</p>
-    <div class="profile-info">
-      <img :src="user.avatarUrl" alt="avatar" class="avatar"/>
-      <p class="username">
+  <div class="max-w-5xl mx-auto px-4 py-6 space-y-6">
+    <h1 class="text-3xl font-bold flex items-center gap-2">📊 GitStatHub</h1>
+    <p class="text-lg text-gray-600">桜影 の GitHub プロジェクト一覧</p>
+
+    <div class="flex items-center gap-4">
+      <img :src="user.avatarUrl" alt="avatar" class="w-32 h-32 rounded-full object-cover shadow" />
+      <p class="text-xl font-semibold">
         {{ user.login }}
-        <a :href="`https://github.com/${user.login}`" class="repo-link" target="_blank" rel="noopener noreferrer">GitHub
-          で見る</a>
+        <a :href="`https://github.com/${user.login}`" target="_blank" rel="noopener noreferrer" class="ml-2 text-blue-600 underline">GitHub で見る</a>
       </p>
     </div>
 
-    <!-- 🔽 タブ切り替え -->
-    <div class="tab-buttons">
-      <button :class="{ active: viewTab === 'list' }" @click="viewTab = 'list'">📦 一覧</button>
-      <button :class="{ active: viewTab === 'chart' }" @click="viewTab = 'chart'">📊 チャート</button>
-      <button :class="{ active: viewTab === 'calendar' }" @click="viewTab = 'calendar'">📅 カレンダー</button>
+    <!-- タブ切り替え -->
+    <div class="flex gap-4 mt-4">
+      <button :class="['px-4 py-2 rounded font-medium border', viewTab === 'list' ? 'bg-blue-500 text-white' : 'bg-white text-gray-800 border-gray-300']" @click="viewTab = 'list'">📦 一覧</button>
+      <button :class="['px-4 py-2 rounded font-medium border', viewTab === 'chart' ? 'bg-blue-500 text-white' : 'bg-white text-gray-800 border-gray-300']" @click="viewTab = 'chart'">📊 チャート</button>
+      <button :class="['px-4 py-2 rounded font-medium border', viewTab === 'calendar' ? 'bg-blue-500 text-white' : 'bg-white text-gray-800 border-gray-300']" @click="viewTab = 'calendar'">📅 カレンダー</button>
     </div>
 
-    <!-- 🔽 コンテンツエリア -->
-    <div v-if="viewTab === 'list'" class="repo-section">
-      <div class="repo-list">
+    <!-- リポジトリ一覧 -->
+    <div v-if="viewTab === 'list'" class="space-y-6">
+      <div class="grid gap-4">
         <RepoCard v-for="repo in paginatedRepos" :key="repo.id" :repo="repo" />
       </div>
 
-      <!-- ページングボタン -->
-      <div class="pagination">
-        <button @click="goToPage(1)" :disabled="currentPage === 1" class="page-btn">≪</button>
-        <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1" class="page-btn">←</button>
-        <span class="page-info">ページ
+      <div class="flex items-center justify-center gap-2 mt-6">
+        <button @click="goToPage(1)" :disabled="currentPage === 1" class="px-3 py-1 border rounded disabled:opacity-50">≪</button>
+        <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1" class="px-3 py-1 border rounded disabled:opacity-50">←</button>
+
+        <span class="flex items-center gap-2">
+          ページ
           <input
               v-model.number="inputPage"
               @keyup.enter="jumpToPage"
               type="number"
               min="1"
               :max="totalPages"
-              class="page-input" /> / {{ totalPages }}
+              class="w-16 px-2 py-1 border rounded text-center"
+          />
+          / {{ totalPages }}
         </span>
-        <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-btn">→</button>
-        <button @click="goToPage(totalPages)" :disabled="currentPage === totalPages" class="page-btn">≫</button>
+
+        <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages" class="px-3 py-1 border rounded disabled:opacity-50">→</button>
+        <button @click="goToPage(totalPages)" :disabled="currentPage === totalPages" class="px-3 py-1 border rounded disabled:opacity-50">≫</button>
       </div>
     </div>
 
-    <div v-else-if="viewTab === 'chart'">
+    <div v-else-if="viewTab === 'chart'" class="mt-6">
       <RepoLanguageChart :repos="repos"/>
     </div>
-    <div v-else>
+
+    <div v-else class="mt-6">
       <ContributionCalendar :username="user.login"/>
     </div>
   </div>
@@ -106,107 +111,5 @@ function jumpToPage() {
 </script>
 
 <style scoped>
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f9f9f9;
-}
-.app-container {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-family: 'Segoe UI', sans-serif;
-  text-align: center;
-}
 
-.repo-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 2rem;
-}
-
-.repo-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  width: 100%;
-}
-
-.repo-link {
-  display: inline-block;
-  margin-top: 0.5rem;
-  color: #0366d6;
-  font-size: 0.875rem;
-  text-decoration: none;
-}
-
-.repo-link:hover {
-  text-decoration: underline;
-}
-
-.tab-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin: 1.5rem 0;
-}
-
-.tab-buttons button {
-  padding: 0.5rem 1rem;
-  background-color: #eee;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s ease;
-}
-
-.tab-buttons button.active {
-  background-color: #007acc;
-  color: white;
-}
-
-.pagination {
-  margin-top: 3rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-}
-
-.page-btn {
-  padding: 0.5rem 1rem;
-  background-color: #f3f4f6;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-
-.page-btn:hover:not(:disabled) {
-  background-color: #e5e7eb;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.page-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.page-info {
-  min-width: 110px;
-  text-align: center;
-}
-
-.page-input {
-  width: 3rem;
-  text-align: center;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  padding: 0.25rem;
-  margin: 0 0.25rem;
-  font-size: 0.9rem;
-}
 </style>
