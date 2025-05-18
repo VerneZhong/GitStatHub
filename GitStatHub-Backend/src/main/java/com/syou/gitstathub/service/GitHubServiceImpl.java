@@ -5,17 +5,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.syou.gitstathub.model.RepoInfo;
-import com.syou.gitstathub.util.GitHubApiHelper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * GitHub service
@@ -31,19 +27,33 @@ public class GitHubServiceImpl implements GitHubService {
     @Value("${github.token}")
     private String githubToken;
 
-    private final GitHubApiHelper gitHubApiHelper;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    public GitHubServiceImpl(GitHubApiHelper gitHubApiHelper, RestTemplate restTemplate, ObjectMapper objectMapper) {
-        this.gitHubApiHelper = gitHubApiHelper;
+    public GitHubServiceImpl(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
     }
 
     @Override
     public List<RepoInfo> fetchUserRepos() {
-        return gitHubApiHelper.getUserRepos(username);
+        List<RepoInfo> allRepos = new ArrayList<>();
+        int page = 1;
+        RepoInfo[] reposOnPage;
+
+        do {
+            String url = "https://api.github.com/users/" + username + "/repos?page=" + page + "&per_page=100";
+            reposOnPage = restTemplate.getForObject(url, RepoInfo[].class);
+
+            if (reposOnPage.length > 0) {
+                allRepos.addAll(Arrays.asList(reposOnPage));
+                page++;
+            } else {
+                break;
+            }
+        } while (reposOnPage.length == 100);
+
+        return allRepos;
     }
 
     @Override

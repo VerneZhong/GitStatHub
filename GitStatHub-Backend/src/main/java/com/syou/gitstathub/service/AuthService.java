@@ -3,7 +3,6 @@ package com.syou.gitstathub.service;
 import com.syou.gitstathub.model.User;
 import com.syou.gitstathub.repository.UserRepository;
 import com.syou.gitstathub.util.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +13,11 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class AuthService {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    public AuthService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public String login(String username, String password) {
         User user = userRepository.findByUsername(username)
@@ -27,6 +26,6 @@ public class AuthService {
         if (user == null || !user.getPassword().equals(password)) {
             throw new RuntimeException("Invalid credentials");
         }
-        return jwtUtil.generateToken(user.getUsername());
+        return JwtUtil.generateToken(user.getUsername());
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 /**
+ * github 贡献统计控制器
  * @author verne.zhong
  * @date 2025/04/17
  * @description

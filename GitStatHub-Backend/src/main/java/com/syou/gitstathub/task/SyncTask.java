@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * sync task
  * @author verne.zhong
  * @date 2025/04/13
  * @description
@@ -30,7 +31,7 @@ public class SyncTask {
     /**
      * 時間毎に実行される
      */
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public void syncGitHubData() {
         log.info("[SyncTask] GitHubデータの同期を開始...");
 

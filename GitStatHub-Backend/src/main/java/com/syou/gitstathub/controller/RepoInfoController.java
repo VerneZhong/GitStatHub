@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
+ * 仓库信息控制器
  * @author verne.zhong
  * @date 2025/04/14
  * @description

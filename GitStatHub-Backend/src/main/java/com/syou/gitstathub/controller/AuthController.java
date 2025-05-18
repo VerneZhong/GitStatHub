@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * login 控制器
  * @author verne.zhong
  * @date 2025/05/17
  * @description

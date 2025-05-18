@@ -19,6 +19,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
+ * security 配置
  * @author verne.zhong
  * @date 2025/05/17
  * @description

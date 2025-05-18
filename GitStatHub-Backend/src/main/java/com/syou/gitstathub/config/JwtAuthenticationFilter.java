@@ -16,6 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
+ * jwt 认证过滤器
  * @author verne.zhong
  * @date 2025/05/17
  * @description
