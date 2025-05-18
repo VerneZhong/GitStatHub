@@ -1,23 +1,40 @@
 <template>
-  <div>
-    <h2>年間アクティビティ</h2>
-    <!-- 年份选择器 -->
-    <div class="year-selector">
-      <button
-          v-for="year in availableYears"
-          :key="year"
-          :class="{ active: selectedYear === year }"
-          @click="selectYear(year)"
-      >
-        {{ year }}
-      </button>
-    </div>
-    <p>今月の貢献数: {{ currentMonthTotal }} / 総貢献数: {{ totalContributions }}</p>
-    <p>
-      {{ totalContributions }} contributions
-      in the {{ selectedYear === new Date().getFullYear() ? 'this year' : selectedYear }}
-    </p>
-    <ContributionGrid v-if="calendar && selectedYear" :weeks="calendar.weeks" />
+  <div class="max-w-4xl mx-auto px-4 py-6 space-y-4">
+    <!-- 年間アクティビティ -->
+    <section class="text-center space-y-4">
+      <h3 class="text-2xl font-semibold">📅 年間アクティビティ</h3>
+
+      <div class="flex flex-wrap justify-center gap-2">
+        <button
+            v-for="year in availableYears"
+            :key="year"
+            :class="[
+          'px-3 py-1 rounded border text-sm transition',
+          selectedYear === year
+            ? 'bg-blue-500 text-white border-blue-500'
+            : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100'
+        ]"
+            @click="selectYear(year)"
+        >
+          {{ year }}
+        </button>
+      </div>
+
+      <div class="text-sm text-gray-700 space-y-1">
+        <p>
+          今月の貢献数: <span class="font-bold text-blue-600">{{ currentMonthTotal }}</span>
+          / 総貢献数: <span class="font-bold">{{ totalContributions }}</span>
+        </p>
+        <p>
+          {{ totalContributions }} contributions in
+          {{ selectedYear === new Date().getFullYear() ? 'this year' : selectedYear }}
+        </p>
+      </div>
+
+      <div class="mt-4">
+        <ContributionGrid v-if="calendar && selectedYear" :weeks="calendar.weeks" />
+      </div>
+    </section>
   </div>
 </template>
 
@@ -71,23 +88,3 @@ const totalContributions = computed(() => {
       .reduce((sum: number, d: any) => sum + d.contributionCount, 0)
 })
 </script>
-
-<style scoped>
-.year-selector {
-  margin-bottom: 1rem;
-  display: flex;
-  gap: 0.5rem;
-  margin-left: 250px;
-}
-.year-selector button {
-  padding: 0.5rem 1rem;
-  border: 1px solid #ccc;
-  background: white;
-  cursor: pointer;
-}
-.year-selector button.active {
-  background: #3b82f6;
-  color: white;
-  border-color: #3b82f6;
-}
-</style>

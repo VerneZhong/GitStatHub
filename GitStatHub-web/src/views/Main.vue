@@ -21,7 +21,10 @@
 
     <!-- リポジトリ一覧 -->
     <div v-if="viewTab === 'list'" class="space-y-6">
-      <div class="grid gap-4">
+      <div v-if="paginatedRepos.length === 0" class="text-gray-500 text-center">
+        リポジトリが見つかりませんでした。
+      </div>
+      <div v-else class="grid gap-4">
         <RepoCard v-for="repo in paginatedRepos" :key="repo.id" :repo="repo" />
       </div>
 
@@ -34,6 +37,7 @@
           <input
               v-model.number="inputPage"
               @keyup.enter="jumpToPage"
+              @blur="jumpToPage"
               type="number"
               min="1"
               :max="totalPages"
@@ -79,6 +83,18 @@ onMounted(async () => {
   } catch (err) {
     console.error('GitHub リポジトリの取得に失敗しました:', err)
   }
+})
+
+onMounted(() => {
+  const savedTab = localStorage.getItem('viewTab')
+  if (savedTab === 'chart' || savedTab === 'calendar') {
+    viewTab.value = savedTab
+  }
+})
+
+
+watch(viewTab, (val) => {
+  localStorage.setItem('viewTab', val)
 })
 
 const reposPerPage = 5
