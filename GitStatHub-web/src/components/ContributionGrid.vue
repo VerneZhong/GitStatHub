@@ -1,20 +1,32 @@
 <template>
-  <div class="contribution-graph">
+  <div class="font-sans max-w-[900px] mx-auto py-5">
     <!-- 月のラベル -->
-    <div class="month-labels">
-      <span v-for="(month, index) in months" :key="index" class="month-label">
+    <div class="flex pl-2 mb-2">
+      <span
+          v-for="(month, index) in months"
+          :key="index"
+          class="flex-1 text-center text-xs text-gray-500 dark:text-gray-400"
+      >
         {{ month }}
       </span>
     </div>
 
-    <div class="contribution-container">
-      <!-- 貢献グリッド -->
-      <div class="contribution-grid">
-        <div v-for="(column, columnIndex) in displayGrid" :key="columnIndex" class="grid-row">
+    <!-- 貢献グリッド -->
+    <div class="overflow-visible">
+      <div class="flex flex-row gap-[2px] overflow-x-visible relative">
+        <div
+            v-for="(column, columnIndex) in displayGrid"
+            :key="columnIndex"
+            class="flex flex-col gap-[2px]"
+        >
           <div
               v-for="(cell, cellIndex) in column"
               :key="cellIndex"
-              :class="['grid-cell', 'tooltip-enabled', { 'has-contributions': cell.count > 0 }]"
+              :class="[
+              'grid-cell',
+              'w-[15px] h-[15px] rounded-sm relative cursor-pointer tooltip-enabled',
+              cell.count > 0 ? 'has-contributions' : '',
+            ]"
               :style="{ backgroundColor: getColor(cell.count) }"
               :data-tooltip="getTooltip(cell.count, cell.date)"
           ></div>
@@ -128,122 +140,33 @@ function getTooltip(count: number, dateStr: string) {
 </script>
 
 <style scoped>
-/* 全体レイアウト */
-.contribution-graph {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px 0;
-}
-
-/* 月のラベルエリア */
-.month-labels {
-  display: flex;
-  padding-left: 10px;
-  margin-bottom: 8px;
-}
-
-.month-label {
-  flex: 1;
-  text-align: center;
-  font-size: 12px;
-  color: #57606a;
-}
-
-/* グリッドコンテナ */
-.contribution-container {
-  overflow: visible;
-}
-
-/* グリッド本体 */
-.contribution-grid {
-  display: flex;
-  flex-direction: row;
-  gap: 2px;
-  overflow-x: visible;
-  position: relative;
-}
-
-/* 列（1週間分） */
-.grid-row {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-/* セル */
-.grid-cell {
-  width: 15px;
-  height: 15px;
-  border-radius: 2px;
-  position: relative;
-  background-color: #ebedf0;
-}
-
-.grid-cell {
-  cursor: pointer;
-}
-
-/* GitHub風ツールチップ */
 .grid-cell.tooltip-enabled:hover::after {
   content: attr(data-tooltip);
   position: absolute;
-  z-index: 1000;
+  z-index: 50;
   background-color: #24292f;
-  color: #ffffff;
+  color: #fff;
   padding: 6px 8px;
   border-radius: 6px;
   font-size: 12px;
   white-space: nowrap;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   bottom: calc(100% + 10px);
   left: 50%;
   transform: translateX(-50%);
   pointer-events: none;
 }
 
-/* ツールチップの三角形 */
 .grid-cell.tooltip-enabled:hover::before {
   content: "";
   position: absolute;
-  z-index: 1000;
+  z-index: 50;
   border-width: 5px;
   border-style: solid;
   border-color: #24292f transparent transparent transparent;
-
   bottom: calc(100% + 0px);
   left: 50%;
   transform: translateX(-50%);
   pointer-events: none;
-}
-
-/* 上部セルのツールチップ位置調整 */
-.grid-cell:hover::after {
-  transform: translateX(-50%) translateY(0);
-  top: -45px;
-  bottom: auto;
-}
-
-.grid-cell:hover::before {
-  top: -15px;
-  bottom: auto;
-}
-
-/* モバイル対応のツールチップ調整 */
-@media (max-width: 768px) {
-  .grid-cell:hover::after {
-    transform: translateX(-50%) translateY(0);
-    max-width: 200px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-}
-
-/* ダークモード調整 */
-@media (prefers-color-scheme: dark) {
-  .month-label {
-    color: #8b949e;
-  }
 }
 </style>
