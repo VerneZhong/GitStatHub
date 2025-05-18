@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.syou.gitstathub.model.RepoInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.util.*;
  * @description
  */
 @Service
+@Slf4j
 public class GitHubServiceImpl implements GitHubService {
     @Value("${github.username}")
     private String username;
@@ -35,6 +37,13 @@ public class GitHubServiceImpl implements GitHubService {
         this.objectMapper = objectMapper;
     }
 
+    private HttpHeaders createHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + githubToken);
+        headers.set("Accept", "application/vnd.github+json");
+        return headers;
+    }
+
     @Override
     public List<RepoInfo> fetchUserRepos() {
         List<RepoInfo> allRepos = new ArrayList<>();
@@ -43,8 +52,14 @@ public class GitHubServiceImpl implements GitHubService {
 
         do {
             String url = "https://api.github.com/users/" + username + "/repos?page=" + page + "&per_page=100";
-            reposOnPage = restTemplate.getForObject(url, RepoInfo[].class);
-
+            HttpEntity<String> entity = new HttpEntity<>(createHeaders());
+            ResponseEntity<RepoInfo[]> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    RepoInfo[].class
+            );
+            reposOnPage = response.getBody();
             if (reposOnPage.length > 0) {
                 allRepos.addAll(Arrays.asList(reposOnPage));
                 page++;
@@ -52,6 +67,30 @@ public class GitHubServiceImpl implements GitHubService {
                 break;
             }
         } while (reposOnPage.length == 100);
+
+        // language set
+        for (RepoInfo repoInfo : allRepos) {
+            String languagesUrl = "https://api.github.com/repos/" + username + "/" + repoInfo.getName() + "/languages";
+            try {
+                HttpEntity<String> entity = new HttpEntity<>(createHeaders());
+                ResponseEntity<Map> langResponse = restTemplate.exchange(
+                        languagesUrl,
+                        HttpMethod.GET,
+                        entity,
+                        Map.class
+                );
+                Map<String, Object> languages = langResponse.getBody();
+                if (languages != null && !languages.isEmpty()) {
+                    repoInfo.setLanguage(languages.keySet().iterator().next());
+                } else {
+                    repoInfo.setLanguage("Unknown");
+                }
+            } catch (Exception e) {
+                // 处理异常仓库，如被 DMCA 封锁
+                repoInfo.setLanguage("Blocked or Error");
+                log.error("Failed to fetch language for repo: {} - {}", repoInfo.getName(), e.getMessage());
+            }
+        }
 
         return allRepos;
     }
