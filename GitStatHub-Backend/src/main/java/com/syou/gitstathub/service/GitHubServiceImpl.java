@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
@@ -37,6 +38,12 @@ public class GitHubServiceImpl implements GitHubService {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * 构造用于调用 GitHub API 的请求头，包含认证信息。
+     * 通常需要在请求中加入 GitHub 的个人访问令牌（Personal Access Token）。
+     *
+     * @return 包含认证信息的 HttpHeaders 对象
+     */
     private HttpHeaders createHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + githubToken);
@@ -44,23 +51,36 @@ public class GitHubServiceImpl implements GitHubService {
         return headers;
     }
 
+    /**
+     * 获取指定 GitHub 用户的所有公共仓库信息，并为每个仓库附加主要编程语言。
+     *
+     * <p>此方法通过调用 GitHub REST API 完成以下任务：
+     * <ul>
+     *   <li>分页获取用户的仓库列表（每页最多 100 个仓库）</li>
+     *   <li>为每个仓库调用 /languages 接口获取语言使用情况</li>
+     *   <li>处理异常情况，如被 DMCA 封锁的仓库或 API 请求失败等</li>
+     * </ul>
+     *
+     * <p>注意事项：
+     * <ul>
+     *   <li>本方法默认已通过 {@code createHeaders()} 方法添加了认证头（建议使用 Personal Access Token）</li>
+     *   <li>未实现 API Rate Limit（速率限制）处理，如有需要建议加入重试或降速机制</li>
+     * </ul>
+     *
+     * @return 包含所有仓库信息的 {@link RepoInfo} 列表，每个仓库附带语言信息
+     */
     @Override
     public List<RepoInfo> fetchUserRepos() {
         List<RepoInfo> allRepos = new ArrayList<>();
         int page = 1;
         RepoInfo[] reposOnPage;
+        HttpEntity<String> entity = new HttpEntity<>(createHeaders());
 
         do {
             String url = "https://api.github.com/users/" + username + "/repos?page=" + page + "&per_page=100";
-            HttpEntity<String> entity = new HttpEntity<>(createHeaders());
-            ResponseEntity<RepoInfo[]> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    entity,
-                    RepoInfo[].class
-            );
+            ResponseEntity<RepoInfo[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, RepoInfo[].class);
             reposOnPage = response.getBody();
-            if (reposOnPage.length > 0) {
+            if (response != null && reposOnPage.length > 0) {
                 allRepos.addAll(Arrays.asList(reposOnPage));
                 page++;
             } else {
@@ -69,28 +89,31 @@ public class GitHubServiceImpl implements GitHubService {
         } while (reposOnPage.length == 100);
 
         // language set
-        for (RepoInfo repoInfo : allRepos) {
-            String languagesUrl = "https://api.github.com/repos/" + username + "/" + repoInfo.getName() + "/languages";
+        allRepos.forEach(repoInfo -> {
+            String languagesUrl = String.format("https://api.github.com/repos/%s/%s/languages", username, repoInfo.getName());
             try {
-                HttpEntity<String> entity = new HttpEntity<>(createHeaders());
-                ResponseEntity<Map> langResponse = restTemplate.exchange(
-                        languagesUrl,
-                        HttpMethod.GET,
-                        entity,
-                        Map.class
-                );
+                ResponseEntity<Map> langResponse = restTemplate.exchange(languagesUrl, HttpMethod.GET, entity, Map.class);
                 Map<String, Object> languages = langResponse.getBody();
+
                 if (languages != null && !languages.isEmpty()) {
-                    repoInfo.setLanguage(languages.keySet().iterator().next());
+                    String firstLang = languages.keySet().iterator().next();
+                    repoInfo.setLanguage(firstLang);
                 } else {
                     repoInfo.setLanguage("Unknown");
+                    log.debug("No languages found for repo: {}", repoInfo.getName());
                 }
+            } catch (HttpClientErrorException.Forbidden e) {
+                // DMCA blocked, permission denied 等
+                repoInfo.setLanguage("Blocked");
+                log.warn("Access blocked for repo: {} - {}", repoInfo.getName(), e.getMessage());
+            } catch (HttpClientErrorException.NotFound e) {
+                repoInfo.setLanguage("Not Found");
+                log.warn("Repo not found: {} - {}", repoInfo.getName(), e.getMessage());
             } catch (Exception e) {
-                // 处理异常仓库，如被 DMCA 封锁
-                repoInfo.setLanguage("Blocked or Error");
+                repoInfo.setLanguage("Error");
                 log.error("Failed to fetch language for repo: {} - {}", repoInfo.getName(), e.getMessage());
             }
-        }
+        });
 
         return allRepos;
     }
