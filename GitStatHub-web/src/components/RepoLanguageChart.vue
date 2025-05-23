@@ -27,6 +27,10 @@ watchEffect(() => {
     langMap[lang] = (langMap[lang] || 0) + 1
   })
 
+  const sortedData = Object.entries(langMap)
+      .sort((a, b) => b[1] - a[1]) // 按数量从大到小排序
+      .map(([name, value]) => ({ name, value }))
+
   chartOption.value = {
     title: {
       text: '使用言語の割合',
@@ -44,7 +48,7 @@ watchEffect(() => {
         name: '言語',
         type: 'pie',
         radius: '50%',
-        data: Object.entries(langMap).map(([name, value]) => ({ name, value })),
+        data: sortedData,
       },
     ],
   }
