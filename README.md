@@ -36,7 +36,7 @@
 | Frontend | Vue.js |
 | Database | MySQL |
 | Visualization | ECharts |
-| API | GitHub REST API（今後 GraphQL API 対応予定） |
+| API | GraphQL API |
 
 ---
 
