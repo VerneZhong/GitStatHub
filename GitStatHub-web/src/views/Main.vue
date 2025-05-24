@@ -17,6 +17,7 @@
       <button :class="['px-4 py-2 rounded font-medium border', viewTab === 'list' ? 'bg-blue-500 text-white' : 'bg-white text-gray-800 border-gray-300']" @click="viewTab = 'list'">📦 一覧</button>
       <button :class="['px-4 py-2 rounded font-medium border', viewTab === 'chart' ? 'bg-blue-500 text-white' : 'bg-white text-gray-800 border-gray-300']" @click="viewTab = 'chart'">📊 チャート</button>
       <button :class="['px-4 py-2 rounded font-medium border', viewTab === 'calendar' ? 'bg-blue-500 text-white' : 'bg-white text-gray-800 border-gray-300']" @click="viewTab = 'calendar'">📅 カレンダー</button>
+      <button :class="['px-4 py-2 rounded font-medium border', viewTab === 'search' ? 'bg-blue-500 text-white' : 'bg-white text-gray-800 border-gray-300']" @click="viewTab = 'search'">🔎 他のユーザー</button>
     </div>
 
     <!-- リポジトリ一覧 -->
@@ -55,9 +56,14 @@
       <RepoLanguageChart :repos="repos"/>
     </div>
 
+    <div v-else-if="viewTab === 'search'" class="mt-6">
+      <GithubRepoList />
+    </div>
+
     <div v-else class="mt-6">
       <ContributionCalendar :username="user.login"/>
     </div>
+
   </div>
 </template>
 
@@ -67,10 +73,11 @@ import {getRepos, checkLogin} from '@/services/api'
 import RepoCard from '@/components/RepoCard.vue'
 import RepoLanguageChart from '@/components/RepoLanguageChart.vue'
 import ContributionCalendar from '@/components/ContributionCalendar.vue'
+import GithubRepoList from '@/components/GithubRepoList.vue'
 import type {RepoInfo} from '@/types'
 
 const repos = ref<RepoInfo[]>([])
-const viewTab = ref<'list' | 'chart' | 'calendar'>('list')
+const viewTab = ref<'list' | 'chart' | 'calendar' | 'search'>('list')
 const user = ref({
   login: 'VerneZhong',
   avatarUrl: 'https://avatars.githubusercontent.com/u/28047190?s=400&u=aa42d63223ab9dacd73967056a49f1e69149071d&v=4'
@@ -91,7 +98,6 @@ onMounted(() => {
     viewTab.value = savedTab
   }
 })
-
 
 watch(viewTab, (val) => {
   localStorage.setItem('viewTab', val)

@@ -45,6 +45,16 @@ export const getRepos = async () => {
     }
 }
 
+export const queryRepos = async (username: string) => {
+    try {
+        const res = await api.get(`/api/repo/queryRepos/${username}`)
+        return res.data
+    } catch (err) {
+        console.error(`Failed to fetch repos for $username:`, err)
+        throw err
+    }
+}
+
 /**
  * ユーザーの貢献度を取得する
  * @param username

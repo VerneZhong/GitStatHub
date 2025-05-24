@@ -34,10 +34,10 @@
         >
           {{ repo.name }}
         </a>
-        <p class="text-sm text-gray-600">{{ repo.description || '无描述' }}</p>
+        <p class="text-sm text-gray-600">{{ repo.description || 'No description' }}</p>
         <div class="text-sm mt-2 flex flex-wrap gap-4 text-gray-500">
           <span>⭐ {{ repo.stargazers_count }}</span>
-          <span>🧑‍💻 {{ repo.language || '未知语言' }}</span>
+          <span>🧑‍💻 {{ repo.language || 'Unknown language' }}</span>
           <span>🔀 Forks: {{ repo.forks_count }}</span>
         </div>
       </div>
@@ -62,7 +62,7 @@ const fetchRepos = async () => {
 
   try {
     const data = await queryRepos(username.value)
-    repos.value = data
+    repos.value = data.data
   } catch (err: any) {
     error.value = err?.message || '请求失败'
   } finally {
