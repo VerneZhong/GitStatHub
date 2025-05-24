@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.syou.gitstathub.model.RepoInfo;
+import com.syou.gitstathub.util.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -39,19 +40,6 @@ public class GitHubServiceImpl implements GitHubService {
     }
 
     /**
-     * 构造用于调用 GitHub API 的请求头，包含认证信息。
-     * 通常需要在请求中加入 GitHub 的个人访问令牌（Personal Access Token）。
-     *
-     * @return 包含认证信息的 HttpHeaders 对象
-     */
-    private HttpHeaders createHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + githubToken);
-        headers.set("Accept", "application/vnd.github+json");
-        return headers;
-    }
-
-    /**
      * 获取指定 GitHub 用户的所有公共仓库信息，并为每个仓库附加主要编程语言。
      *
      * <p>此方法通过调用 GitHub REST API 完成以下任务：
@@ -74,13 +62,13 @@ public class GitHubServiceImpl implements GitHubService {
         List<RepoInfo> allRepos = new ArrayList<>();
         int page = 1;
         RepoInfo[] reposOnPage;
-        HttpEntity<String> entity = new HttpEntity<>(createHeaders());
+        HttpEntity<String> entity = new HttpEntity<>(HttpUtil.createHeaders(githubToken));
 
         do {
             String url = "https://api.github.com/users/" + username + "/repos?page=" + page + "&per_page=100";
             ResponseEntity<RepoInfo[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, RepoInfo[].class);
             reposOnPage = response.getBody();
-            if (response != null && reposOnPage.length > 0) {
+            if (reposOnPage.length > 0) {
                 allRepos.addAll(Arrays.asList(reposOnPage));
                 page++;
             } else {
