@@ -1,25 +1,25 @@
 <template>
   <div class="p-6 max-w-4xl mx-auto">
-    <h1 class="text-2xl font-bold mb-4">🔍 GitHub 用户仓库查询</h1>
+    <h1 class="text-2xl font-bold mb-4">🔍 GitHub ユーザーリポジトリクエリ</h1>
 
     <div class="flex gap-2 mb-6">
       <input
           v-model="username"
           @keyup.enter="fetchRepos"
           type="text"
-          placeholder="输入 GitHub 用户名..."
+          placeholder="Enter your GitHub username..."
           class="flex-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
       <button
           @click="fetchRepos"
           class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
       >
-        查询
+        検索
       </button>
     </div>
 
-    <div v-if="loading" class="text-gray-500">加载中...</div>
-    <div v-if="error" class="text-red-500">获取失败：{{ error }}</div>
+    <div v-if="loading" class="text-gray-500">読み込み中...</div>
+    <div v-if="error" class="text-red-500">取得に失敗しました：{{ error }}</div>
 
     <div v-if="repos.length > 0" class="grid gap-4">
       <div

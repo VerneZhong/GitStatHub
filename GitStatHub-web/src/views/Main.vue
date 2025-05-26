@@ -1,5 +1,16 @@
 <!-- src/App.vue -->
 <template>
+  <div class="absolute top-4 right-4">
+    <button
+        @click="logout"
+        class="flex items-center gap-2 bg-white hover:bg-gray-100 text-gray-800 border border-gray-300 px-4 py-2 rounded-full shadow-sm transition"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M16 17v1a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1h-2V6H6v12h8v-1h2ZM21 12l-4-4v3h-5v2h5v3l4-4Z"/>
+      </svg>
+      ログアウト
+    </button>
+  </div>
   <div class="max-w-5xl mx-auto px-4 py-6 space-y-6">
     <h1 class="text-3xl font-bold flex items-center gap-2">📊 GitStatHub</h1>
     <p class="text-lg text-gray-600">桜影 の GitHub プロジェクト一覧</p>
@@ -129,6 +140,11 @@ function jumpToPage() {
     alert(`1 〜 ${totalPages.value} の間で入力してください`)
     inputPage.value = currentPage.value
   }
+}
+
+function logout() {
+  localStorage.removeItem('authToken')
+  window.location.href = '/'
 }
 </script>
 
