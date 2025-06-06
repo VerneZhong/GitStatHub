@@ -20,7 +20,7 @@
 - 🧠 使用言語別のリポジトリ数やスター数をグラフ化  
   Visualize repo count & stars by programming language
 
-- 📅 コミット数や貢献履歴の可視化（緑格子対応予定）  
+- 📅 コミット数や貢献履歴の可視化
   Display contribution timeline (GitHub-style heatmap in progress)
 
 - 🧑‍💻 ポートフォリオ風プロフィールページの公開機能  
