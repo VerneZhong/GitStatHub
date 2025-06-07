@@ -40,7 +40,11 @@ export const getRepos = async () => {
         const res = await api.get('/api/repo/repos')
         return res.data
     } catch (err) {
-        console.error('Failed to fetch repos:', err)
+        if (axios.isAxiosError(err)) {
+            console.error(`Failed to fetch repos:`, err.response?.data || err.message)
+        } else {
+            console.error('Failed to fetch repos:', err)
+        }
         throw err
     }
 }
@@ -50,7 +54,11 @@ export const queryRepos = async (username: string) => {
         const res = await api.get(`/api/repo/queryRepos/${username}`)
         return res.data
     } catch (err) {
-        console.error(`Failed to fetch repos for $username:`, err)
+        if (axios.isAxiosError(err)) {
+            console.error(`queryRepos failed:`, err.response?.data || err.message)
+        } else {
+            console.error('queryRepos failed:', err)
+        }
         throw err
     }
 }
@@ -81,7 +89,11 @@ export const getContributionsByYear = async (username: string, year: number) => 
         })
         return res.data
     } catch (err) {
-        console.error(`Failed to fetch contributions for ${username} in ${year}:`, err)
+        if (axios.isAxiosError(err)) {
+            console.error(`getContributionsByYear failed`, err.response?.data || err.message)
+        } else {
+            console.error('getContributionsByYear failed:', err)
+        }
         throw err
     }
 }
@@ -96,7 +108,11 @@ export const login = async (username: string, password: string) => {
         const res = await api.post('/api/auth/login', { username, password })
         return res.data
     } catch (err) {
-        console.error('Login failed:', err)
+        if (axios.isAxiosError(err)) {
+            console.error('login failed:', err.response?.data || err.message)
+        } else {
+            console.error('login failed:', err)
+        }
         throw err
     }
 }
@@ -109,7 +125,11 @@ export const logout = async () => {
         const res = await api.post('/api/auth/logout')
         return res.data
     } catch (err) {
-        console.error('Logout failed:', err)
+        if (axios.isAxiosError(err)) {
+            console.error('logout failed:', err.response?.data || err.message)
+        } else {
+            console.error('logout failed:', err)
+        }
         throw err
     }
 }
@@ -122,7 +142,28 @@ export const checkLogin = async () => {
         const res = await api.get('/api/auth/check')
         return res.data // e.g. { loggedIn: true }
     } catch (err) {
-        console.error('Check login failed:', err)
+        if (axios.isAxiosError(err)) {
+            console.error('Check failed:', err.response?.data || err.message)
+        } else {
+            console.error('Check failed:', err)
+        }
+        throw err
+    }
+}
+
+/**
+ * 登録する
+ */
+export const register = async (username: string, password: string, email: string) => {
+    try {
+        const res = await api.post('/api/auth/register', {username, password, email})
+        return res.data
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            console.error('Register failed:', err.response?.data || err.message)
+        } else {
+            console.error('Register failed:', err)
+        }
         throw err
     }
 }

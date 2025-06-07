@@ -2,6 +2,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Login from '@/views/Login.vue'
 import Main from "../views/Main.vue";
+import Register from "../views/register.vue";
 
 const routes = [
     {
@@ -18,6 +19,11 @@ const routes = [
         name: 'Main',
         component: Main,
         meta: { requiresAuth: true } // 需要登录的页面
+    },
+    {
+        path: '/register',
+        name: 'Register',
+        component: Register
     }
 ]
 

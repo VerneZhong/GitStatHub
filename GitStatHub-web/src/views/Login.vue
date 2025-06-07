@@ -23,6 +23,13 @@
         >
           ログイン
         </button>
+        <button
+            type="button"
+            @click="goToRegister"
+            class="w-full py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition duration-200"
+        >
+          登録
+        </button>
       </form>
       <p v-if="errorMessage" class="text-red-500 text-sm mt-4 text-center">
         {{ errorMessage }}
@@ -50,5 +57,9 @@ const handleLogin = async () => {
     console.error(err)
     errorMessage.value = 'ログインに失敗しました'
   }
+}
+
+function goToRegister() {
+  router.push('/register')
 }
 </script>
