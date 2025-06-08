@@ -26,4 +26,5 @@ npm install axios
 npm install vue-echarts echarts
 npm install vue-router@4
 npm install tailwindcss @tailwindcss/vite
+npm install vee-validate yup
 npm run dev
