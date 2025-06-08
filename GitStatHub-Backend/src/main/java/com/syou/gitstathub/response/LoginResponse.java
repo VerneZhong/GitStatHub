@@ -9,7 +9,11 @@ import lombok.Data;
  * @description
  */
 @Data
-@AllArgsConstructor
-public class LoginResponse {
+public class LoginResponse extends BaseResponse {
     private String token;
+
+    public LoginResponse(String token) {
+        super();
+        this.token = token;
+    }
 }

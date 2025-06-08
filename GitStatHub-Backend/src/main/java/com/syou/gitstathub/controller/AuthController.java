@@ -1,6 +1,8 @@
 package com.syou.gitstathub.controller;
 
 import com.syou.gitstathub.request.LoginRequest;
+import com.syou.gitstathub.request.RegisterRequest;
+import com.syou.gitstathub.response.BaseResponse;
 import com.syou.gitstathub.response.LoginResponse;
 import com.syou.gitstathub.response.ResultVo;
 import com.syou.gitstathub.service.AuthService;
@@ -30,4 +32,9 @@ public class AuthController {
         return ResponseEntity.ok(new LoginResponse(token));
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<BaseResponse> register(@RequestBody RegisterRequest registerRequest) {
+        authService.register(registerRequest);
+        return ResponseEntity.ok(new BaseResponse());
+    }
 }

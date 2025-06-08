@@ -2,9 +2,12 @@ package com.syou.gitstathub.service;
 
 import com.syou.gitstathub.model.User;
 import com.syou.gitstathub.repository.UserRepository;
+import com.syou.gitstathub.request.RegisterRequest;
 import com.syou.gitstathub.util.JwtUtil;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.Comparator;
 
 /**
  * @author verne.zhong
@@ -27,5 +30,15 @@ public class AuthService {
             throw new RuntimeException("Invalid credentials");
         }
         return JwtUtil.generateToken(user.getUsername());
+    }
+
+    public void register(RegisterRequest registerRequest) {
+        User user = new User();
+        user.setUsername(registerRequest.getUsername());
+        user.setPassword(registerRequest.getPassword());
+        user.setAccountNonExpired(1);
+        user.setAccountNonLocked(1);
+        user.setEnabled(1);
+        userRepository.save(user);
     }
 }
