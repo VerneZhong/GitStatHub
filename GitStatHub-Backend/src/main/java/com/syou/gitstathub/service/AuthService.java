@@ -36,6 +36,7 @@ public class AuthService {
         User user = new User();
         user.setUsername(registerRequest.getUsername());
         user.setPassword(registerRequest.getPassword());
+        user.setEmail(registerRequest.getEmail());
         user.setAccountNonExpired(1);
         user.setAccountNonLocked(1);
         user.setEnabled(1);

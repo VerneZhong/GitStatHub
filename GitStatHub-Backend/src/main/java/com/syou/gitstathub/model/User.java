@@ -27,4 +27,5 @@ public class User {
     @JsonProperty("credentials_non_expired")
     private int credentialsNonExpired;
     private int enabled;
+    private String email;
 }

@@ -69,13 +69,13 @@ const schema = yup.object({
   password: yup.string().min(6, 'パスワードは6文字以上で入力してください。').required('パスワードを入力してください。')
 })
 
-const handleRegister = async () => {
+const handleRegister = async (values) => {
   if (isSubmitting.value) return
   isSubmitting.value = true
   errorMessage.value = ''
 
   try {
-    await register(username.value, password.value, email.value)
+    await register(values.username, values.password, values.email)
     router.push('/login')
   } catch (err) {
     console.error(err)
