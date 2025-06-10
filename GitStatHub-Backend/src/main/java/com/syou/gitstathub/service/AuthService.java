@@ -4,12 +4,10 @@ import com.syou.gitstathub.model.User;
 import com.syou.gitstathub.repository.UserRepository;
 import com.syou.gitstathub.request.RegisterRequest;
 import com.syou.gitstathub.util.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Comparator;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author verne.zhong
@@ -27,6 +25,12 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * ユーザログイン
+     * @param username
+     * @param password
+     * @return
+     */
     public String login(String username, String password) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() ->
@@ -37,6 +41,11 @@ public class AuthService {
         return JwtUtil.generateToken(user.getUsername());
     }
 
+    /**
+     * ユーザ登録
+     * @param registerRequest
+     */
+    @Transactional(rollbackFor = Exception.class)
     public void register(RegisterRequest registerRequest) {
         User user = new User();
         user.setUsername(registerRequest.getUsername());
