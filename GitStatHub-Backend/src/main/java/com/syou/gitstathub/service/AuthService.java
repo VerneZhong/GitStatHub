@@ -56,4 +56,13 @@ public class AuthService {
         user.setEnabled(1);
         userRepository.save(user);
     }
+
+    /**
+     * ユーザ名の重複チェック
+     * @param username ユーザ名
+     * @return true　ユーザ名の重複なし false　ユーザ名の重複あり
+     */
+    public boolean checkUsername(String username) {
+        return userRepository.findByUsername(username).isEmpty();
+    }
 }

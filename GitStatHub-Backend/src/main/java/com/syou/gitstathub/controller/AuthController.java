@@ -37,4 +37,9 @@ public class AuthController {
         authService.register(registerRequest);
         return ResponseEntity.ok(new BaseResponse());
     }
+
+    @PostMapping("/checkUsername")
+    public ResponseEntity<ResultVo<Boolean>> checkUsername(String username) {
+        return ResponseEntity.ok(ResultVo.success(authService.checkUsername(username)));
+    }
 }

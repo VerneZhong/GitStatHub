@@ -51,7 +51,7 @@
 import {ref} from 'vue'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import * as yup from 'yup'
-import {register} from "@/services/api.js";
+import {register, checkUsername} from "@/services/api.js";
 import {useRouter} from 'vue-router'
 
 const router = useRouter()
@@ -64,7 +64,21 @@ const isSubmitting = ref(false)
 
 // ✅ Yup 校验规则
 const schema = yup.object({
-  username: yup.string().required('ユーザー名を入力してください。'),
+  username: yup.string()
+      .required('ユーザー名を入力してください。')
+      .test(
+          'unique-check',
+          'このユーザー名は既に使われています。',
+          async (value) => {
+            if (!value) return false
+            try {
+              return await checkUsername(value)
+            } catch (e) {
+              console.error('ユーザー名の確認に失敗しました', e)
+              return false
+            }
+          }
+      ),
   email: yup.string().email('有効なメールアドレスを入力してください。').required('メールアドレスを入力してください。'),
   password: yup.string().min(6, 'パスワードは6文字以上で入力してください。').required('パスワードを入力してください。')
 })

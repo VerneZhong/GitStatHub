@@ -167,3 +167,23 @@ export const register = async (username: string, password: string, email: string
         throw err
     }
 }
+
+/**
+ * ユーザー名をチェックする
+ * @param username
+ */
+export const checkUsername = async (username: string): Promise<boolean> => {
+    try {
+        const res = await api.post('api/auth/checkUsername', null, {
+            params: { username }
+        })
+        return res.data.data
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            console.error('checkUsername failed:', err.response?.data || err.message)
+        } else {
+            console.error('checkUsername failed:', err)
+        }
+        throw err
+    }
+}
