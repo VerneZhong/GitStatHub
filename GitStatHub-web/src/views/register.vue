@@ -56,9 +56,6 @@ import {useRouter} from 'vue-router'
 
 const router = useRouter()
 
-const username = ref('')
-const email = ref('')
-const password = ref('')
 const errorMessage = ref('')
 const isSubmitting = ref(false)
 
@@ -79,8 +76,12 @@ const schema = yup.object({
             }
           }
       ),
-  email: yup.string().email('有効なメールアドレスを入力してください。').required('メールアドレスを入力してください。'),
-  password: yup.string().min(6, 'パスワードは6文字以上で入力してください。').required('パスワードを入力してください。')
+  email: yup.string()
+      .email('有効なメールアドレスを入力してください。')
+      .required('メールアドレスを入力してください。'),
+  password: yup.string()
+      .min(6, 'パスワードは6文字以上で入力してください。')
+      .required('パスワードを入力してください。')
 })
 
 const handleRegister = async (values) => {
