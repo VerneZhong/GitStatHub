@@ -24,7 +24,7 @@ public class JwtUtil {
     private static final SecureDigestAlgorithm<SecretKey, ?> ALGORITHM = Jwts.SIG.HS256;
 
     // token 有效时间（毫秒）=> 1 小时
-    private static final long EXPIRATION_TIME = 60 * 60 * 1000;
+    private static final long EXPIRATION_TIME = 120 * 60 * 1000;
 
     // 创建签名 key
     private static SecretKey getSigningKey() {
