@@ -1,6 +1,6 @@
 github:
   username: VerneZhong
-  token: "ghp_xxxxxxxx123456789"
+  token: ${GITHUB_TOKEN}
 
 spring:
   application:
@@ -17,6 +17,11 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
 
 logging:
   level:
@@ -28,3 +33,6 @@ logging:
           descriptor:
             sql:
               BasicBinder: TRACE
+
+jwt:
+  secret: ${JWT_SECRET}

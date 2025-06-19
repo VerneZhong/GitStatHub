@@ -5,6 +5,8 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecureDigestAlgorithm;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -19,20 +21,23 @@ import java.util.Date;
  */
 @Component
 public class JwtUtil {
+
     // 密钥必须足够长（建议至少256位：32字符）
-    private static final String SECRET = "my-super-secret-key-that-is-long-enough!!";
+    @Value("${jwt.secret}")
+    private String secret;
+
     private static final SecureDigestAlgorithm<SecretKey, ?> ALGORITHM = Jwts.SIG.HS256;
 
     // token 有效时间（毫秒）=> 1 小时
     private static final long EXPIRATION_TIME = 120 * 60 * 1000;
 
     // 创建签名 key
-    private static SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     // 生成 Token
-    public static String generateToken(String username) {
+    public String generateToken(String username) {
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
@@ -42,7 +47,7 @@ public class JwtUtil {
     }
 
     // 解析 Token
-    public static Claims parseToken(String token) throws JwtException {
+    public Claims parseToken(String token) throws JwtException {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
@@ -51,7 +56,7 @@ public class JwtUtil {
     }
 
     // 从 Token 中获取用户名
-    public static String getUsernameFromToken(String token) {
+    public String getUsernameFromToken(String token) {
         try {
             return parseToken(token).getSubject();
         } catch (JwtException e) {
@@ -60,7 +65,7 @@ public class JwtUtil {
     }
 
     // 判断 token 是否过期
-    public static boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         try {
             Date expiration = parseToken(token).getExpiration();
             return expiration.before(new Date());

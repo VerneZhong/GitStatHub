@@ -20,9 +20,12 @@ public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    private final JwtUtil jwtUtil;
+
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     /**
@@ -38,7 +41,7 @@ public class AuthService {
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
-        return JwtUtil.generateToken(user.getUsername());
+        return jwtUtil.generateToken(user.getUsername());
     }
 
     /**
