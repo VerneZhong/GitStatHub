@@ -31,47 +31,46 @@
       <button :class="['px-4 py-2 rounded font-medium border', viewTab === 'search' ? 'bg-blue-500 text-white' : 'bg-white text-gray-800 border-gray-300']" @click="viewTab = 'search'">🔎 他のユーザー</button>
     </div>
 
-    <!-- ソートオプション -->
-    <div class="flex items-center gap-4 mt-4">
-      <span class="text-gray-700 font-medium">並び替え:</span>
-      <div class="flex gap-2">
-        <button
-            @click="setSort('updated')"
-            :class="[
+    <!-- リポジトリ一覧 -->
+    <div v-if="viewTab === 'list'" class="space-y-6">
+      <!-- ソートオプション -->
+      <div class="flex items-center gap-4 mt-4">
+        <span class="text-gray-700 font-medium">並び替え:</span>
+        <div class="flex gap-2">
+          <button
+              @click="setSort('updated')"
+              :class="[
         'px-3 py-1 border rounded-full text-sm transition',
         sortKey === 'updated' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100'
       ]"
-        >更新日</button>
+          >更新日</button>
 
-        <button
-            @click="setSort('stars')"
-            :class="[
+          <button
+              @click="setSort('stars')"
+              :class="[
         'px-3 py-1 border rounded-full text-sm transition',
         sortKey === 'stars' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100'
       ]"
-        >⭐ スター数</button>
+          >⭐ スター数</button>
 
-        <button
-            @click="setSort('name')"
-            :class="[
+          <button
+              @click="setSort('name')"
+              :class="[
         'px-3 py-1 border rounded-full text-sm transition',
         sortKey === 'name' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100'
       ]"
-        >🔤 名前</button>
+          >🔤 名前</button>
+        </div>
+
+        <button
+            @click="toggleSortOrder"
+            class="ml-2 px-2 py-1 border rounded-full text-sm transition bg-white text-gray-800 border-gray-300 hover:bg-gray-100"
+            :title="sortOrder === 'desc' ? '降順' : '昇順'"
+        >
+          <span v-if="sortOrder === 'desc'">⬇</span>
+          <span v-else>⬆</span>
+        </button>
       </div>
-
-      <button
-          @click="toggleSortOrder"
-          class="ml-2 px-2 py-1 border rounded-full text-sm transition bg-white text-gray-800 border-gray-300 hover:bg-gray-100"
-          :title="sortOrder === 'desc' ? '降順' : '昇順'"
-      >
-        <span v-if="sortOrder === 'desc'">⬇</span>
-        <span v-else>⬆</span>
-      </button>
-    </div>
-
-    <!-- リポジトリ一覧 -->
-    <div v-if="viewTab === 'list'" class="space-y-6">
       <div v-if="paginatedRepos.length === 0" class="text-gray-500 text-center">
         リポジトリが見つかりませんでした。
       </div>
