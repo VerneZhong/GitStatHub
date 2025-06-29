@@ -154,9 +154,9 @@ export const checkLogin = async () => {
 /**
  * 登録する
  */
-export const register = async (username: string, password: string, email: string) => {
+export const register = async (username: string, password: string, email: string, gitAccount: string) => {
     try {
-        const res = await api.post('/api/auth/register', {username, password, email})
+        const res = await api.post('/api/auth/register', {username, password, email, gitAccount})
         return res.data
     } catch (err) {
         if (axios.isAxiosError(err)) {
