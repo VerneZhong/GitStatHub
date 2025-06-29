@@ -28,4 +28,6 @@ public class User {
     private int credentialsNonExpired;
     private int enabled;
     private String email;
+    @JsonProperty("git_account")
+    private String gitAccount;
 }

@@ -57,6 +57,7 @@ public class AuthService {
         user.setAccountNonExpired(1);
         user.setAccountNonLocked(1);
         user.setEnabled(1);
+        user.setGitAccount(registerRequest.getGitAccount());
         userRepository.save(user);
     }
 

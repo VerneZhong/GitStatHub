@@ -27,6 +27,14 @@
         />
         <ErrorMessage name="password" class="text-red-500 text-sm mb-4 block text-left" />
 
+        <Field
+            name="gitAccount"
+            type="text"
+            placeholder="GitHubアカウント"
+            class="w-full mb-2 px-4 py-2 border rounded-lg"
+        />
+        <ErrorMessage name="gitAccount" class="text-red-500 text-sm mb-2 block text-left" />
+
         <button
             :disabled="isSubmitting"
             type="submit"
@@ -90,7 +98,7 @@ const handleRegister = async (values) => {
   errorMessage.value = ''
 
   try {
-    await register(values.username, values.password, values.email)
+    await register(values.username, values.password, values.email, values.gitAccount)
     router.push('/login')
   } catch (err) {
     console.error(err)
