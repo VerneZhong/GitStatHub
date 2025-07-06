@@ -3,11 +3,14 @@ package com.syou.gitstathub.service;
 import com.syou.gitstathub.model.User;
 import com.syou.gitstathub.repository.UserRepository;
 import com.syou.gitstathub.request.RegisterRequest;
+import com.syou.gitstathub.response.UserInfoResponse;
 import com.syou.gitstathub.util.JwtUtil;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 /**
  * @author verne.zhong
@@ -68,5 +71,17 @@ public class AuthService {
      */
     public boolean checkUsername(String username) {
         return userRepository.findByUsername(username).isEmpty();
+    }
+
+    public UserInfoResponse getUserInfo(String username) {
+        Optional<User> byUsername = userRepository.findByUsername(username);
+        UserInfoResponse userInfoResponse = new UserInfoResponse();
+        if (byUsername.isPresent()) {
+            User user = byUsername.get();
+            userInfoResponse.setId(user.getId());
+            userInfoResponse.setUsername(user.getUsername());
+            userInfoResponse.setGitAccount(user.getGitAccount());
+        }
+        return userInfoResponse;
     }
 }

@@ -118,7 +118,7 @@
 
 <script setup lang="ts">
 import {onMounted, ref, computed, watch} from 'vue'
-import {getRepos, checkLogin} from '@/services/api'
+import {getContributions, getRepos, getUserInfo} from '@/services/api'
 import RepoCard from '@/components/RepoCard.vue'
 import RepoLanguageChart from '@/components/RepoLanguageChart.vue'
 import ContributionCalendar from '@/components/ContributionCalendar.vue'
@@ -128,7 +128,7 @@ import type {RepoInfo} from '@/types'
 const repos = ref<RepoInfo[]>([])
 const viewTab = ref<'list' | 'chart' | 'calendar' | 'search'>('list')
 const user = ref({
-  login: 'VerneZhong',
+  login: '',
   avatarUrl: 'https://avatars.githubusercontent.com/u/28047190?s=400&u=aa42d63223ab9dacd73967056a49f1e69149071d&v=4'
 })
 const sortKey = ref<'updated' | 'stars' | 'name'>(localStorage.getItem('sortKey') as any || 'updated')
@@ -145,7 +145,7 @@ function toggleSortOrder() {
 watch([sortKey, sortOrder], () => {
   localStorage.setItem('sortKey', sortKey.value)
   localStorage.setItem('sortOrder', sortOrder.value)
-  currentPage.value = 1 // 切换排序时重置页数
+  currentPage.value = 1
 })
 
 onMounted(async () => {
@@ -154,6 +154,14 @@ onMounted(async () => {
     repos.value = res.data
   } catch (err) {
     console.error('GitHub リポジトリの取得に失敗しました:', err)
+  }
+})
+
+onMounted(async () => {
+  const username = localStorage.getItem('username');
+  if (username) {
+    const userInfo = await getUserInfo(username);
+    user.value.login = userInfo.gitAccount;
   }
 })
 
@@ -222,7 +230,3 @@ function logout() {
   window.location.href = '/'
 }
 </script>
-
-<style scoped>
-
-</style>

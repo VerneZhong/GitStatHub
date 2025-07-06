@@ -5,13 +5,11 @@ import com.syou.gitstathub.request.RegisterRequest;
 import com.syou.gitstathub.response.BaseResponse;
 import com.syou.gitstathub.response.LoginResponse;
 import com.syou.gitstathub.response.ResultVo;
+import com.syou.gitstathub.response.UserInfoResponse;
 import com.syou.gitstathub.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * login 控制器
@@ -41,5 +39,10 @@ public class AuthController {
     @PostMapping("/checkUsername")
     public ResponseEntity<ResultVo<Boolean>> checkUsername(String username) {
         return ResponseEntity.ok(ResultVo.success(authService.checkUsername(username)));
+    }
+
+    @GetMapping("/getUserInfo/{username}")
+    public ResponseEntity<UserInfoResponse> getUserInfo(@PathVariable String username) {
+        return ResponseEntity.ok(authService.getUserInfo(username));
     }
 }

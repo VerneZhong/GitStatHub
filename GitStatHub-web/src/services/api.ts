@@ -187,3 +187,17 @@ export const checkUsername = async (username: string): Promise<boolean> => {
         throw err
     }
 }
+
+export const getUserInfo = async (username: string) => {
+    try {
+        const res = await api.get(`/api/auth/getUserInfo/${username}`)
+        return res.data
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            console.error('getUserInfo failed:', err.response?.data || err.message)
+        } else {
+            console.error('getUserInfo failed:', err)
+        }
+        throw err
+    }
+}
