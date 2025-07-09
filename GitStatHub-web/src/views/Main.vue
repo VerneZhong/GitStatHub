@@ -118,7 +118,7 @@
 
 <script setup lang="ts">
 import {onMounted, ref, computed, watch} from 'vue'
-import {getContributions, getRepos, getUserInfo} from '@/services/api'
+import {getRepos, getUserInfo} from '@/services/api'
 import RepoCard from '@/components/RepoCard.vue'
 import RepoLanguageChart from '@/components/RepoLanguageChart.vue'
 import ContributionCalendar from '@/components/ContributionCalendar.vue'
