@@ -51,7 +51,7 @@ const router = useRouter()
 const handleLogin = async () => {
   try {
     const res = await login(username.value, password.value)
-    if (res.code === '200') {
+    if (res.code === 200) {
       localStorage.setItem('authToken', res.token)
       localStorage.setItem('username', username.value);
       router.push('/app') // 登录成功后跳转
