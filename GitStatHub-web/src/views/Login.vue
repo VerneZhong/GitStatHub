@@ -54,7 +54,7 @@ const handleLogin = async () => {
     if (res.code === 200) {
       localStorage.setItem('authToken', res.token)
       localStorage.setItem('username', username.value);
-      router.push('/app') // 登录成功后跳转
+      router.push('/app') // Jump after successful login
     } else {
       errorMessage.value = res.message
     }

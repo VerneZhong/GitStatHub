@@ -69,8 +69,13 @@ export const queryRepos = async (username: string) => {
  */
 export const getContributions = async (username: string) => {
     try {
-        const res = await api.get(`/api/github/contributions/${username}`)
-        return res.data
+        if (username) {
+            const res = await api.get(`/api/github/contributions/${username}`)
+            return res.data
+        } else {
+            localStorage.removeItem('authToken')
+            window.location.href = '/login'
+        }
     } catch (err) {
         console.error(`Failed to fetch contributions for ${username}:`, err)
         throw err

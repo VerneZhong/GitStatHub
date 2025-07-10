@@ -39,27 +39,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import {getContributions, getContributionsByYear} from '@/services/api'
+import {ref, computed, watch} from 'vue'
+import {getContributions, getContributionsByYear, getUserInfo} from '@/services/api'
 import ContributionGrid from './ContributionGrid.vue'
-
-const props = defineProps<{
-  username: string
-}>()
 
 // 年份选择
 const selectedYear = ref(new Date().getFullYear());
 const availableYears = Array.from({ length: 7 }, (_, i) => 2025 - i); // [2025, 2024, ..., 2019]
 
 const calendar = ref<any>({ weeks: [] });
+const username = ref<string | null>(localStorage.getItem("username"));
+const gitAccount = ref<string | null>(null);
 
-onMounted(async () => {
-  calendar.value = await getContributions(props.username)
-})
+watch(username, async (newVal) => {
+  if (!newVal) return;
+
+  try {
+    const userInfo = await getUserInfo(newVal);
+    gitAccount.value = userInfo.gitAccount;
+    calendar.value = await getContributions(userInfo.gitAccount);
+  } catch (err) {
+    console.error("获取用户信息失败，可能登录已过期", err);
+    gitAccount.value = null;
+    calendar.value = null;
+    window.location.href = "/login";
+  }
+}, { immediate: true });
 
 async function fetchContributions(year: number) {
   calendar.value = null;
-  calendar.value = await getContributionsByYear(props.username, year);
+  calendar.value = await getContributionsByYear(gitAccount.value, year);
 }
 
 // 切换年份
