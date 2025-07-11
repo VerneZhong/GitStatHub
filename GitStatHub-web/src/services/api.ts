@@ -90,7 +90,7 @@ export const getContributions = async (username: string) => {
 export const getContributionsByYear = async (username: string, year: number) => {
     try {
         const res = await api.get('/api/github/contributionsByYear', {
-            params: { username, year },
+            params: { username, year }
         })
         return res.data
     } catch (err) {

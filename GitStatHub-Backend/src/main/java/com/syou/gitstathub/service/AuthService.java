@@ -33,9 +33,9 @@ public class AuthService {
 
     /**
      * ユーザログイン
-     * @param username
-     * @param password
-     * @return
+     * @param username ユーザ名
+     * @param password パスワード
+     * @return JWT token
      */
     public String login(String username, String password) {
         User user = userRepository.findByUsername(username)
@@ -49,7 +49,7 @@ public class AuthService {
 
     /**
      * ユーザ登録
-     * @param registerRequest
+     * @param registerRequest ユーザ登録リクエスト
      */
     @Transactional(rollbackFor = Exception.class)
     public void register(RegisterRequest registerRequest) {
