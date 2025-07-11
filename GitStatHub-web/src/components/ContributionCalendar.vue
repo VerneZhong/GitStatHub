@@ -59,7 +59,6 @@ watch(username, async (newVal) => {
     gitAccount.value = userInfo.gitAccount;
     calendar.value = await getContributions(userInfo.gitAccount);
   } catch (err) {
-    console.error("获取用户信息失败，可能登录已过期", err);
     gitAccount.value = null;
     calendar.value = null;
     window.location.href = "/login";
