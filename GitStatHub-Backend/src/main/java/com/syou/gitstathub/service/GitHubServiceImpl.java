@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.syou.gitstathub.Constants;
 import com.syou.gitstathub.model.RepoInfo;
 import com.syou.gitstathub.util.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +66,7 @@ public class GitHubServiceImpl implements GitHubService {
         HttpEntity<String> entity = new HttpEntity<>(HttpUtil.createHeaders(githubToken));
 
         do {
-            String url = "https://api.github.com/users/" + username + "/repos?page=" + page + "&per_page=100";
+            String url = Constants.GITHUB_USER_URL + username + "/repos?page=" + page + "&per_page=100";
             ResponseEntity<RepoInfo[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, RepoInfo[].class);
             reposOnPage = response.getBody();
             if (reposOnPage.length > 0) {
@@ -76,22 +77,20 @@ public class GitHubServiceImpl implements GitHubService {
             }
         } while (reposOnPage.length == 100);
 
-        // language set
         allRepos.forEach(repoInfo -> {
-            String languagesUrl = String.format("https://api.github.com/repos/%s/%s/languages", username, repoInfo.getName());
+            String languagesUrl = String.format(Constants.GITHUB_REPO_LANG_URL, username, repoInfo.getName());
             try {
                 ResponseEntity<Map> langResponse = restTemplate.exchange(languagesUrl, HttpMethod.GET, entity, Map.class);
                 Map<String, Object> languages = langResponse.getBody();
 
-                if (languages != null && !languages.isEmpty()) {
+                if (!languages.isEmpty()) {
                     String firstLang = languages.keySet().iterator().next();
                     repoInfo.setLanguage(firstLang);
                 } else {
-                    repoInfo.setLanguage("Unknown");
+                    repoInfo.setLanguage(Constants.UN_KNOWN);
                     log.debug("No languages found for repo: {}", repoInfo.getName());
                 }
             } catch (HttpClientErrorException.Forbidden e) {
-                // DMCA blocked, permission denied 等
                 repoInfo.setLanguage("Blocked");
                 log.warn("Access blocked for repo: {} - {}", repoInfo.getName(), e.getMessage());
             } catch (HttpClientErrorException.NotFound e) {
@@ -108,7 +107,6 @@ public class GitHubServiceImpl implements GitHubService {
 
     @Override
     public Map<String, Object> getContributions(String username) throws JsonProcessingException {
-        String url = "https://api.github.com/graphql";
         Map<String, Object> body = getStringObjectMap(username);
 
         HttpHeaders headers = new HttpHeaders();
@@ -117,7 +115,7 @@ public class GitHubServiceImpl implements GitHubService {
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(Constants.GITHUB_GRAPHQL_URL, HttpMethod.POST, entity, String.class);
 
         JsonNode root = objectMapper.readTree(response.getBody());
         JsonNode calendarNode = root.path("data")
@@ -189,7 +187,6 @@ public class GitHubServiceImpl implements GitHubService {
                 }
             }
         }
-
         return count;
     }
 
@@ -242,9 +239,8 @@ public class GitHubServiceImpl implements GitHubService {
         headers.setBearerAuth(githubToken);
         HttpEntity<String> entity = new HttpEntity<>(mapper.writeValueAsString(request), headers);
 
-        // 请求 GitHub GraphQL
         ResponseEntity<JsonNode> response = restTemplate.postForEntity(
-                "https://api.github.com/graphql",
+                Constants.GITHUB_GRAPHQL_URL,
                 entity,
                 JsonNode.class
         );
