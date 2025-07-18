@@ -1,4 +1,4 @@
-package com.syou.gitstathub;
+package com.syou.gitstathub.config;
 
 import java.util.List;
 
@@ -22,4 +22,7 @@ public class Constants {
     public static final String GITHUB_REPO_LANG_URL = "https://api.github.com/repos/%s/%s/languages";
     public static final String GITHUB_GRAPHQL_URL = "https://api.github.com/graphql";
     public static final String UN_KNOWN = "Unknown";
+    public static final String AUTHORIZATION = "Authorization";
+    public static final String ACCEPT = "Accept";
+    public static final String JSON_TYPE = "application/vnd.github+json";
 }

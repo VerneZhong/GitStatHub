@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.syou.gitstathub.Constants;
+import com.syou.gitstathub.config.Constants;
 import com.syou.gitstathub.model.RepoInfo;
 import com.syou.gitstathub.util.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -107,15 +107,9 @@ public class GitHubServiceImpl implements GitHubService {
 
     @Override
     public Map<String, Object> getContributions(String username) throws JsonProcessingException {
-        Map<String, Object> body = getStringObjectMap(username);
+        HttpEntity<Map<String, Object>> httpEntity = HttpUtil.createHttpEntity(githubToken, getStringObjectMap(username));
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(githubToken);
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(Constants.GITHUB_GRAPHQL_URL, HttpMethod.POST, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(Constants.GITHUB_GRAPHQL_URL, HttpMethod.POST, httpEntity, String.class);
 
         JsonNode root = objectMapper.readTree(response.getBody());
         JsonNode calendarNode = root.path("data")

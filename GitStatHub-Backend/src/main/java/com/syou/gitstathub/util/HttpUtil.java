@@ -1,6 +1,9 @@
 package com.syou.gitstathub.util;
 
-import org.springframework.http.HttpHeaders;
+import com.syou.gitstathub.config.Constants;
+import org.springframework.http.*;
+
+import java.util.Map;
 
 /**
  * @author verne.zhong
@@ -16,8 +19,15 @@ public class HttpUtil {
      */
     public static HttpHeaders createHeaders(String token) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-        headers.set("Accept", "application/vnd.github+json");
+        headers.set(Constants.AUTHORIZATION, "Bearer " + token);
+        headers.set(Constants.ACCEPT, Constants.JSON_TYPE);
         return headers;
+    }
+
+    public static HttpEntity<Map<String, Object>> createHttpEntity(String token, Map<String, Object> body) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
+        return new HttpEntity<>(body, headers);
     }
 }

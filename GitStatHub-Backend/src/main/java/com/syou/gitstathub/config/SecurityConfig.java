@@ -2,7 +2,6 @@ package com.syou.gitstathub.config;
 
 import java.util.List;
 
-import com.syou.gitstathub.Constants;
 import com.syou.gitstathub.service.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
