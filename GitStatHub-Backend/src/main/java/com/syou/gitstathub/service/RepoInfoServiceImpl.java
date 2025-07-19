@@ -1,5 +1,6 @@
 package com.syou.gitstathub.service;
 
+import com.syou.gitstathub.config.Constants;
 import com.syou.gitstathub.model.RepoInfo;
 import com.syou.gitstathub.model.RepositoryInfo;
 import com.syou.gitstathub.repository.RepoInfoRepository;
@@ -54,7 +55,7 @@ public class RepoInfoServiceImpl implements RepoInfoService {
         HttpEntity<String> entity = new HttpEntity<>(HttpUtil.createHeaders(githubToken));
 
         do {
-            String url = "https://api.github.com/users/" + username + "/repos?page=" + page + "&per_page=100";
+            String url = Constants.GITHUB_USER_URL + username + "/repos?page=" + page + "&per_page=100";
             ResponseEntity<RepositoryInfo[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, RepositoryInfo[].class);
             reposOnPage = response.getBody();
             if (reposOnPage.length > 0) {
