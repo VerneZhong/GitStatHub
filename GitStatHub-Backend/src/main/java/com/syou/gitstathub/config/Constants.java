@@ -25,4 +25,5 @@ public class Constants {
     public static final String AUTHORIZATION = "Authorization";
     public static final String ACCEPT = "Accept";
     public static final String JSON_TYPE = "application/vnd.github+json";
+    public static final String BEARER = "Bearer ";
 }

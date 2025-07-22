@@ -19,7 +19,7 @@ public class HttpUtil {
      */
     public static HttpHeaders createHeaders(String token) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(Constants.AUTHORIZATION, "Bearer " + token);
+        headers.set(Constants.AUTHORIZATION, Constants.BEARER + token);
         headers.set(Constants.ACCEPT, Constants.JSON_TYPE);
         return headers;
     }
