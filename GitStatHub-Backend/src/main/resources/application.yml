@@ -28,7 +28,7 @@ logging:
     root: INFO
     org:
       hibernate:
-        SQL: DEBUG
+        SQL: INFO
         type:
           descriptor:
             sql:
