@@ -1,4 +1,3 @@
-<!-- src/components/RepoLanguageChart.vue -->
 <template>
   <v-chart class="chart" :option="chartOption" />
 </template>
