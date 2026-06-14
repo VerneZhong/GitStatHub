@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.7",
+    "@tailwindcss/vite": "^4.3.1",
     "axios": "^1.15.0",
     "echarts": "^5.6.0",
     "echarts-for-vue": "^1.4.1",
@@ -22,13 +22,13 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.7",
     "@types/node": "^22.14.1",
-    "@vitejs/plugin-vue": "^5.2.1",
+    "@vitejs/plugin-vue": "^6.0.7",
     "@vue/tsconfig": "^0.7.0",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.7",
     "typescript": "~5.7.2",
-    "vite": "^6.4.1",
+    "vite": "^8.0.16",
     "vue-tsc": "^2.2.4"
   }
 }
